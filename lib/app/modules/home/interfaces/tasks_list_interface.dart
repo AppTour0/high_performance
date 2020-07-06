@@ -1,6 +1,6 @@
 import 'package:high_performance/app/modules/home/models/tasks_list_model.dart';
 
-abstract class ITaskListRepository {
+abstract class ITasksListRepository {
   Future<int> insert(TasksListModel row);
   Future<List<TasksListModel>> queryAllRows();
   Future<int> queryRowCount();
@@ -9,7 +9,7 @@ abstract class ITaskListRepository {
   Future<TasksListModel> findById(id);
 }
 
-abstract class ITaskListService {
+abstract class ITasksListService {
   Future<int> insert(TasksListModel row);
   Future<List<TasksListModel>> queryAllRows();
   Future<int> queryRowCount();

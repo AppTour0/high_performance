@@ -5,11 +5,13 @@ class AppWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Slidy',
+      title: 'High Performance',
+      debugShowCheckedModeBanner: false,
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
       initialRoute: '/',
+      navigatorKey: Modular.navigatorKey,
       onGenerateRoute: Modular.generateRoute,
     );
   }

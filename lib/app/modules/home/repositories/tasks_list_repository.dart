@@ -1,16 +1,81 @@
 import 'package:flutter_modular/flutter_modular.dart';
-import 'package:dio/dio.dart';
-import 'package:high_performance/app/modules/home/interfaces/task_list_interface.dart';
 import 'package:high_performance/app/modules/home/models/tasks_list_model.dart';
 import 'package:high_performance/app/shared/db/db.dart';
 import 'package:sqflite/sqflite.dart';
 
-class TasksListRepository extends Disposable implements ITaskListRepository {
+class TasksListRepository extends Disposable {
   static final _table = "tasks_list";
 
-  Future<Database> _database() {
+  Future<Database> _getDatabase() {
     return DatabaseHelper.instance.database;
   }
+
+  Future<List<TasksListModel>> getTasksList() async {
+    try {
+      final Database db = await _getDatabase();
+      final List<Map<String, dynamic>> maps = await db.query(_table);
+
+      return List.generate(
+        maps.length,
+        (i) {
+          return TasksListModel(
+            id: maps[i]['id'],
+            idTask: maps[i]['task_id'],
+            dateCreate: maps[i]['date_create'],
+          );
+        },
+      );
+    } catch (ex) {
+      print(ex);
+      return new List<TasksListModel>();
+    }
+  }
+
+  Future create(TasksListModel model) async {
+    try {
+      final Database db = await _getDatabase();
+
+      await db.insert(
+        _table,
+        model.toMap(),
+        conflictAlgorithm: ConflictAlgorithm.replace,
+      );
+    } catch (ex) {
+      print(ex);
+      return;
+    }
+  }
+
+  Future delete(int id) async {
+    try {
+      final Database db = await _getDatabase();
+      await db.delete(
+        _table,
+        where: 'id = ?',
+        whereArgs: [id],
+      );
+    } catch (ex) {
+      print(ex);
+      return;
+    }
+  }
+
+  Future update(TasksListModel model) async {
+    try {
+      final Database db = await _getDatabase();
+      await db.update(
+        _table,
+        model.toMap(),
+        where: "id = ?",
+        whereArgs: [model.id],
+      );
+    } catch (ex) {
+      print(ex);
+      return;
+    }
+  }
+
+  /* 
 
   // Insere uma linha no banco de dados onde cada chave
   // no Map é um nome de coluna e o valor é o valor da coluna.
@@ -30,7 +95,7 @@ class TasksListRepository extends Disposable implements ITaskListRepository {
   Future<List<TasksListModel>> queryAllRows() async {
     final Database db = await _database();
     try {
-      final task = await db.query(_table);
+      final List<Map<String, dynamic>> task = await db.query(_table);
 
       return List.generate(task.length, (i) {
         return TasksListModel(
@@ -99,7 +164,7 @@ class TasksListRepository extends Disposable implements ITaskListRepository {
     }
 
     return null;
-  }
+  } */
 
   //dispose will be called automatically
   @override

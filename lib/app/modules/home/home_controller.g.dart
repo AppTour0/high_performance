@@ -9,38 +9,45 @@ part of 'home_controller.dart';
 // ignore_for_file: non_constant_identifier_names, unnecessary_brace_in_string_interps, unnecessary_lambdas, prefer_expression_function_bodies, lines_longer_than_80_chars, avoid_as, avoid_annotating_with_dynamic
 
 mixin _$HomeController on _HomeBase, Store {
-  final _$valueAtom = Atom(name: '_HomeBase.value');
+  final _$getListAsyncAction = AsyncAction('_HomeBase.getList');
 
   @override
-  int get value {
-    _$valueAtom.reportRead();
-    return super.value;
+  Future getList() {
+    return _$getListAsyncAction.run(() => super.getList());
   }
 
+  final _$getTaskAsyncAction = AsyncAction('_HomeBase.getTask');
+
   @override
-  set value(int value) {
-    _$valueAtom.reportWrite(value, super.value, () {
-      super.value = value;
-    });
+  Future getTask() {
+    return _$getTaskAsyncAction.run(() => super.getTask());
   }
 
-  final _$_HomeBaseActionController = ActionController(name: '_HomeBase');
+  final _$saveAsyncAction = AsyncAction('_HomeBase.save');
 
   @override
-  void increment() {
-    final _$actionInfo =
-        _$_HomeBaseActionController.startAction(name: '_HomeBase.increment');
-    try {
-      return super.increment();
-    } finally {
-      _$_HomeBaseActionController.endAction(_$actionInfo);
-    }
+  Future save(TasksListModel model) {
+    return _$saveAsyncAction.run(() => super.save(model));
+  }
+
+  final _$deleteAsyncAction = AsyncAction('_HomeBase.delete');
+
+  @override
+  Future delete(int id) {
+    return _$deleteAsyncAction.run(() => super.delete(id));
+  }
+
+  final _$updateAsyncAction = AsyncAction('_HomeBase.update');
+
+  @override
+  Future update(TasksListModel model) {
+    return _$updateAsyncAction.run(() => super.update(model));
   }
 
   @override
   String toString() {
     return '''
-value: ${value}
+
     ''';
   }
 }

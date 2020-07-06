@@ -55,7 +55,7 @@ class DatabaseHelper {
     var sql = [
       '''DROP TABLE IF EXISTS tasks;''',
       '''DROP TABLE IF EXISTS tasks_list;''',
-      '''create table if not exists taks (
+      '''create table if not exists tasks (
             id integer primary key autoincrement,
             name text,
             date_modification datetime,
@@ -69,15 +69,15 @@ class DatabaseHelper {
             task_id int NOT NULL,
             foreign key (task_id) references tasks (id) ON DELETE CASCADE
             );''',
-      /* '''insert into dog (name,date_create) values('pit bull',strftime('%d-%m-%Y %H:%M:%S', datetime('now')));''',
-      '''insert into dog (name,date_create) values('dalmatas',strftime('%d-%m-%Y %H:%M:%S', datetime('now')));''',
-      '''insert into dog (name,date_create) values('poodle',strftime('%d-%m-%Y %H:%M:%S', datetime('now')));''',
-      '''insert into canil (name,date_create, dog_id)
-             values('canil de osasco',strftime('%d-%m-%Y %H:%M:%S', datetime('now')),1);''',
-      '''insert into canil (name,date_create, dog_id)
-             values('canil de lavras',strftime('%d-%m-%Y %H:%M:%S', datetime('now')),2);''',
-      '''insert into canil (name,date_create, dog_id)
-             values('canil de paraisópolis',strftime('%d-%m-%Y %H:%M:%S', datetime('now')),3);''', */
+      '''insert into tasks (name,date_create) values('acordar cedo',strftime('%d-%m-%Y %H:%M:%S', datetime('now')));''',
+      '''insert into tasks (name,date_create) values('ler livro',strftime('%d-%m-%Y %H:%M:%S', datetime('now')));''',
+      '''insert into tasks (name,date_create) values('beber água',strftime('%d-%m-%Y %H:%M:%S', datetime('now')));''',
+      '''insert into tasks_list (date_create, task_id)
+             values(strftime('%d-%m-%Y %H:%M:%S', datetime('now')),1);''',
+      '''insert into tasks_list (date_create, task_id)
+             values(strftime('%d-%m-%Y %H:%M:%S', datetime('now')),2);''',
+      '''insert into tasks_list (date_create, task_id)
+             values(strftime('%d-%m-%Y %H:%M:%S', datetime('now')),3);''',
     ];
 
     for (var i = 0; i < sql.length; i++) {
