@@ -1,7 +1,7 @@
 import 'package:flutter_modular/flutter_modular.dart';
 import 'package:dio/dio.dart';
 import 'package:high_performance/app/modules/home/interfaces/tasks_interface.dart';
-import 'package:high_performance/app/modules/home/models/tasks_model.dart';
+import 'package:high_performance/app/modules/tasks/tasks_model.dart';
 import 'package:high_performance/app/shared/db/db.dart';
 import 'package:sqflite/sqflite.dart';
 

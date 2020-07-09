@@ -2,9 +2,9 @@ import 'package:flutter/cupertino.dart';
 import 'package:high_performance/app/modules/home/interfaces/tasks_interface.dart';
 import 'package:high_performance/app/modules/home/interfaces/tasks_list_interface.dart';
 import 'package:high_performance/app/modules/home/models/tasks_list_model.dart';
-import 'package:high_performance/app/modules/home/models/tasks_model.dart';
+import 'package:high_performance/app/modules/tasks/tasks_model.dart';
 import 'package:high_performance/app/modules/home/repositories/tasks_list_repository.dart';
-import 'package:high_performance/app/modules/home/repositories/tasks_repository.dart';
+import 'package:high_performance/app/modules/tasks/tasks_repository.dart';
 import 'package:mobx/mobx.dart';
 
 part 'home_controller.g.dart';
@@ -21,8 +21,12 @@ abstract class _HomeBase with Store {
     getTask();
   }
 
+  @observable
   ObservableList<TasksListModel> tasksList = ObservableList<TasksListModel>();
+  @observable
   ObservableList<TasksModel> tasks = ObservableList<TasksModel>();
+
+  ObservableStream<List<TasksListModel>> tasksList2;
 
 /*   @action
   toggleSearch() {

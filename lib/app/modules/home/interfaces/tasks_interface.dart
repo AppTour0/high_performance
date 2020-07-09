@@ -1,4 +1,4 @@
-import 'package:high_performance/app/modules/home/models/tasks_model.dart';
+import 'package:high_performance/app/modules/tasks/tasks_model.dart';
 
 abstract class ITasksRepository {
   Future<int> insert(TasksModel row);

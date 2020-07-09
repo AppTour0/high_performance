@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_modular/flutter_modular.dart';
+import 'package:high_performance/app/components/custom_tile/custom_tile.dart';
+import 'package:high_performance/app/components/custom_tile/tile_model.dart';
 import 'package:high_performance/app/modules/home/home_controller.dart';
 import 'package:high_performance/app/modules/home/home_module.dart';
 import 'package:high_performance/app/modules/home/models/tasks_list_model.dart';
-import 'package:high_performance/app/modules/home/models/tasks_model.dart';
+import 'package:high_performance/app/modules/tasks/tasks_model.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:intl/intl.dart';
 
@@ -17,6 +19,7 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   final controller = HomeModule.to.get<HomeController>();
+  List<TasksModel> task;
 
   void initState() {
     super.initState();
@@ -26,32 +29,59 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          title: controller.tasksList.length == null
+          /* title: controller.tasksList.length == null
               ? Text(widget.title)
               : Text(
-                  widget.title + " " + controller.tasksList.length.toString()),
+                  widget.title + " " + controller.tasksList.length.toString()), */
+          title: Text(widget.title),
         ),
         floatingActionButton: FloatingActionButton(
-          onPressed: _modalAdd,
+          //onPressed: _modalAdd,
+          onPressed: () async {
+            await Modular.to
+                .pushNamed("/tasks", arguments: null)
+                .whenComplete(() => controller.getList());
+          },
           child: Icon(Icons.add),
         ),
         body: Observer(
           builder: (context) {
-            if (controller.tasksList.length == null) {
+            /* if (controller.tasksList.isEmpty || controller.tasks.isEmpty) {
               return Center(child: CircularProgressIndicator());
+            } */
+
+            if (controller.tasksList.isEmpty || controller.tasks.isEmpty) {
+              return Center(child: Text("Não há tarefas"));
             }
 
-            if (controller.tasksList.length == 0) {
-              return Center(child: Text("Não há dados"));
-            }
+            List<TasksListModel> listTasks = controller.tasksList.toList();
 
-            return ListView.builder(
+            List<TileModel> tileModel = List.generate(
+              listTasks.length,
+              (i) {
+                return TileModel(
+                    id: listTasks[i].id,
+                    title: listTasks[i].name,
+                    subtitle: listTasks[i].dateCreate.toString());
+              },
+            );
+
+            return Padding(
+              padding: const EdgeInsets.fromLTRB(5, 0, 5, 0),
+              child: CustomTile(
+                list: tileModel,
+                route: "/tasks",
+                tapAction: controller.getList(),
+              ),
+            );
+
+            /* ListView.builder(
               shrinkWrap: true,
               itemCount: controller.tasksList.length,
               itemBuilder: (BuildContext ctxt, int index) {
                 int idTask = controller.tasksList[index].idTask;
-                List<TasksModel> task =
-                    controller.tasks.where((e) => e.id == idTask).toList();
+                task = controller.tasks.where((e) => e.id == idTask).toList();
+                List<TasksListModel> listTasks = controller.tasksList.toList();
 
                 return Center(
                     child: Column(
@@ -77,9 +107,13 @@ class _HomePageState extends State<HomePage> {
                                 Icons.edit,
                                 color: Colors.deepPurple,
                               ),
-                              onPressed: () {
-                                _modalUpdate(
-                                    model: controller.tasksList[index]);
+                              onPressed: () async {
+                                await Modular.to
+                                    .pushNamed("/tasks",
+                                        arguments: listTasks[index])
+                                    .whenComplete(() => controller.getList());
+                                /* _modalUpdate(
+                                    model: controller.tasksList[index]); */
                               }),
                         ],
                       ),
@@ -88,69 +122,9 @@ class _HomePageState extends State<HomePage> {
                   ],
                 ));
               },
-            );
+            ); */
           },
-        )
-
-        /* FutureBuilder<List<TasksModel>>(
-          future: controller.getList(),
-          builder: (BuildContext context, snapshot) {
-            Widget child;
-
-            if (snapshot.hasData) {
-              child = ListView.builder(
-                shrinkWrap: true,
-                itemCount: snapshot.data.length,
-                itemBuilder: (BuildContext ctxt, int index) {
-                  return Center(
-                      child: Column(
-                    children: <Widget>[
-                      ListTile(
-                        title: Text(snapshot.data[index].name),
-                        subtitle: Text(
-                            snapshot.data[index].dateModification.toString()),
-                        trailing: Wrap(
-                          children: <Widget>[
-                            IconButton(
-                              icon: Icon(
-                                Icons.delete,
-                                color: Colors.red,
-                              ),
-                              onPressed: () => setState(() {
-                                controller.delete(snapshot.data[index].id);
-                              }),
-                            ),
-                            IconButton(
-                              icon: Icon(
-                                Icons.edit,
-                                color: Colors.deepPurple,
-                              ),
-                              onPressed: () =>
-                                  _modalUpdate(model: snapshot.data[index]),
-                            ),
-                          ],
-                        ),
-                      ),
-                      Divider(),
-                    ],
-                  ));
-                },
-              );
-            } else if (snapshot.hasError) {
-              child = Icon(
-                Icons.error_outline,
-                color: Colors.red,
-                size: 60,
-              );
-            } else {
-              child = Center(child: CircularProgressIndicator());
-            }
-            return Container(
-              child: child,
-            );
-          },
-        ) */
-        );
+        ));
   }
 
   _modalAdd({TasksListModel model}) {

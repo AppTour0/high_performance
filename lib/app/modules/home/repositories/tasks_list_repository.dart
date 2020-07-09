@@ -13,16 +13,47 @@ class TasksListRepository extends Disposable {
   Future<List<TasksListModel>> getTasksList() async {
     try {
       final Database db = await _getDatabase();
-      final List<Map<String, dynamic>> maps = await db.query(_table);
+      //final List<Map<String, dynamic>> maps = await db.query(_table);
+      final List<Map<String, dynamic>> maps =
+          await db.rawQuery('''SELECT a.*, b.name FROM tasks_list a
+            inner join tasks b
+              on b.id = a.task_id
+        ''');
 
       return List.generate(
         maps.length,
         (i) {
           return TasksListModel(
-            id: maps[i]['id'],
-            idTask: maps[i]['task_id'],
-            dateCreate: maps[i]['date_create'],
-          );
+              id: maps[i]['id'],
+              idTask: maps[i]['task_id'],
+              dateCreate: maps[i]['date_create'],
+              name: maps[i]['name']);
+        },
+      );
+    } catch (ex) {
+      print(ex);
+      return new List<TasksListModel>();
+    }
+  }
+
+  Future<List<TasksListModel>> getTask(int id) async {
+    try {
+      final Database db = await _getDatabase();
+      final List<Map<String, dynamic>> maps = await db.rawQuery('''
+          SELECT a.*, b.name FROM tasks_list a
+            inner join tasks b
+              on b.id = a.task_id
+          Where a.id = $id
+        ''');
+
+      return List.generate(
+        maps.length,
+        (i) {
+          return TasksListModel(
+              id: maps[i]['id'],
+              idTask: maps[i]['task_id'],
+              dateCreate: maps[i]['date_create'],
+              name: maps[i]['name']);
         },
       );
     } catch (ex) {
