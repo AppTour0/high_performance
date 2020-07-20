@@ -1,12 +1,35 @@
-import 'package:flutter_modular/flutter_modular.dart';
-import 'package:dio/dio.dart';
-import 'package:high_performance/app/modules/home/interfaces/tasks_interface.dart';
-import 'package:high_performance/app/modules/tasks/tasks_model.dart';
-import 'package:high_performance/app/shared/db/db.dart';
-import 'package:sqflite/sqflite.dart';
+import 'package:moor_flutter/moor_flutter.dart';
+import 'package:high_performance/app/shared/db/database.dart';
 
-class TasksRepository extends Disposable {
-  static final _table = "tasks";
+part 'tasks_repository.g.dart';
+
+@UseDao(tables: [Tasks])
+class TasksRepository extends DatabaseAccessor<Database>
+    with _$TasksRepositoryMixin {
+  Stream<List<Task>> getTasks() {
+    return (select(tasks)).watch();
+  }
+
+  Future<List<Task>> getUserFuture() {
+    return (select(tasks)).get();
+  }
+
+  Future insertData(Task entity) {
+    return into(tasks).insert(entity);
+  }
+
+  Future updateData(Task entity) {
+    return update(tasks).replace(entity);
+  }
+
+  Future deleteData(id) {
+    return (delete(tasks)..where((task) => task.id.equals(id))).go();
+  }
+
+  TasksRepository(Database db) : super(db);
+}
+
+/* static final _table = "tasks";
 
   Future<Database> _getDatabase() {
     return DatabaseHelper.instance.database;
@@ -75,9 +98,7 @@ class TasksRepository extends Disposable {
       print(ex);
       return;
     }
-  }
+  } */
 
-  //dispose will be called automatically
-  @override
-  void dispose() {}
-}
+//dispose will be called automatically
+/* W */

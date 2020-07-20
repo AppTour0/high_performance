@@ -12,73 +12,35 @@ mixin _$HomeController on _HomeBase, Store {
   final _$tasksListAtom = Atom(name: '_HomeBase.tasksList');
 
   @override
-  ObservableList<TasksListModel> get tasksList {
+  ObservableStream<List<TasksListWithTask>> get tasksList {
     _$tasksListAtom.reportRead();
     return super.tasksList;
   }
 
   @override
-  set tasksList(ObservableList<TasksListModel> value) {
+  set tasksList(ObservableStream<List<TasksListWithTask>> value) {
     _$tasksListAtom.reportWrite(value, super.tasksList, () {
       super.tasksList = value;
     });
   }
 
-  final _$tasksAtom = Atom(name: '_HomeBase.tasks');
+  final _$_HomeBaseActionController = ActionController(name: '_HomeBase');
 
   @override
-  ObservableList<TasksModel> get tasks {
-    _$tasksAtom.reportRead();
-    return super.tasks;
-  }
-
-  @override
-  set tasks(ObservableList<TasksModel> value) {
-    _$tasksAtom.reportWrite(value, super.tasks, () {
-      super.tasks = value;
-    });
-  }
-
-  final _$getListAsyncAction = AsyncAction('_HomeBase.getList');
-
-  @override
-  Future getList() {
-    return _$getListAsyncAction.run(() => super.getList());
-  }
-
-  final _$getTaskAsyncAction = AsyncAction('_HomeBase.getTask');
-
-  @override
-  Future getTask() {
-    return _$getTaskAsyncAction.run(() => super.getTask());
-  }
-
-  final _$saveAsyncAction = AsyncAction('_HomeBase.save');
-
-  @override
-  Future save(TasksListModel model) {
-    return _$saveAsyncAction.run(() => super.save(model));
-  }
-
-  final _$deleteAsyncAction = AsyncAction('_HomeBase.delete');
-
-  @override
-  Future delete(int id) {
-    return _$deleteAsyncAction.run(() => super.delete(id));
-  }
-
-  final _$updateAsyncAction = AsyncAction('_HomeBase.update');
-
-  @override
-  Future update(TasksListModel model) {
-    return _$updateAsyncAction.run(() => super.update(model));
+  dynamic getList() {
+    final _$actionInfo =
+        _$_HomeBaseActionController.startAction(name: '_HomeBase.getList');
+    try {
+      return super.getList();
+    } finally {
+      _$_HomeBaseActionController.endAction(_$actionInfo);
+    }
   }
 
   @override
   String toString() {
     return '''
-tasksList: ${tasksList},
-tasks: ${tasks}
+tasksList: ${tasksList}
     ''';
   }
 }

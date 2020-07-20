@@ -1,15 +1,17 @@
 class TasksModel {
   int id = 0;
   String name = "";
-  String dateModification = "";
+  String dateModification;
+  String dateCreate;
 
-  TasksModel({this.id, this.name, this.dateModification});
+  TasksModel({this.id, this.name, this.dateModification, this.dateCreate});
 
   factory TasksModel.fromMap(Map<String, dynamic> json) {
     return TasksModel(
       id: json["id"],
       name: json["name"],
       dateModification: json["date_modification"],
+      dateCreate: json["date_create"],
     );
   }
 
@@ -18,18 +20,7 @@ class TasksModel {
       'id': id,
       'name': name,
       'date_modification': dateModification,
+      'date_create': dateCreate,
     };
   }
-
-  /* factory TasksModel.fromJson(Map<String, dynamic> json) {
-    return TasksModel(
-        //field: json[''],
-        );
-  }
-
-  Map<String, dynamic> toJson(TasksModel model) {
-    Map<String, dynamic> json = Map<String, dynamic>();
-
-    return json;
-  } */
 }

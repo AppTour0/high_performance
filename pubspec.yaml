@@ -27,6 +27,14 @@ dependencies:
   rxdart: ^0.24.1
   flutter_modular: ^1.2.7+1
   intl: 0.16.1
+  moor: # use the latest version
+  moor_flutter: 3.1.0
+  path:
+  path_provider:
+  android_alarm_manager: ^0.4.5+11
+  flutter_local_notifications: 1.4.4+2
+  shared_preferences: 0.5.8
+  flutter_ringtone_player: 2.0.0
   flutter:
     sdk: flutter
 
@@ -38,11 +46,9 @@ dev_dependencies:
   mobx_codegen: ^1.1.0+1
   build_runner: ^1.10.0
   mockito: ^4.1.1
+  moor_generator: # use the latest version
   flutter_test:
     sdk: flutter
-  path:
-  path_provider:
-  sqflite:
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec

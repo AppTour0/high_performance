@@ -26,7 +26,8 @@ class CustomTile extends StatelessWidget {
             child: Column(
           children: <Widget>[
             ListTile(
-              title: Text(list[index].title),
+              title:
+                  Text(list[index].id.toString() + " - " + list[index].title),
               subtitle: Text(list[index].subtitle),
               onTap: () {
                 route != null

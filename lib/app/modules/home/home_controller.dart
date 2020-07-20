@@ -1,10 +1,8 @@
 import 'package:flutter/cupertino.dart';
-import 'package:high_performance/app/modules/home/interfaces/tasks_interface.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:high_performance/app/modules/home/interfaces/tasks_list_interface.dart';
-import 'package:high_performance/app/modules/home/models/tasks_list_model.dart';
-import 'package:high_performance/app/modules/tasks/tasks_model.dart';
-import 'package:high_performance/app/modules/home/repositories/tasks_list_repository.dart';
-import 'package:high_performance/app/modules/tasks/tasks_repository.dart';
+import 'package:high_performance/app/modules/home/tasks_list_model.dart';
+import 'package:high_performance/app/shared/db/database.dart';
 import 'package:mobx/mobx.dart';
 
 part 'home_controller.g.dart';
@@ -12,41 +10,40 @@ part 'home_controller.g.dart';
 class HomeController = _HomeBase with _$HomeController;
 
 abstract class _HomeBase with Store {
-  final ITasksListService tasksListService;
-  final _repository = TasksListRepository();
-  final _taskRepository = TasksRepository();
+  final _repository = Database.instance.tasksListRepository;
 
-  _HomeBase({@required this.tasksListService}) {
+  FlutterLocalNotificationsPlugin localNotificationsPlugin =
+      FlutterLocalNotificationsPlugin();
+
+  initializeNotifications() async {
+    var initializeAndroid =
+        AndroidInitializationSettings('@mipmap/ic_launcher');
+    var initializeIOS = IOSInitializationSettings();
+    var initSettings = InitializationSettings(initializeAndroid, initializeIOS);
+    await localNotificationsPlugin.initialize(initSettings);
+  }
+
+  _HomeBase() {
     getList();
-    getTask();
+    initializeNotifications();
   }
 
   @observable
-  ObservableList<TasksListModel> tasksList = ObservableList<TasksListModel>();
-  @observable
-  ObservableList<TasksModel> tasks = ObservableList<TasksModel>();
+  ObservableStream<List<TasksListWithTask>> tasksList;
 
-  ObservableStream<List<TasksListModel>> tasksList2;
+  @action
+  getList() {
+    var teste = _repository.getTasksList().asObservable();
+    tasksList = teste;
+  }
 
-/*   @action
+  /* 
+  @action
   toggleSearch() {
     showSearch = !showSearch;
-  } */
-
-  @action
-  getList() async {
-    var data = await _repository.getTasksList();
-    tasksList.clear();
-    tasksList.addAll(data);
   }
 
   @action
-  getTask() async {
-    var data = await _taskRepository.getTasks();
-    tasks.clear();
-    tasks.addAll(data);
-  }
-  /* @action
   search(String term) async {
     final repository = new TasksListRepository();
     tasksList2 = new ObservableList<TasksListModel>();
@@ -55,22 +52,17 @@ abstract class _HomeBase with Store {
   } */
 
   /* @action
-  Future<List<TasksModel>> getList() async {
-    return await tasksService.queryAllRows();
-  } */
-
-  @action
   save(TasksListModel model) async {
     await _repository.create(model);
   }
 
   @action
   delete(int id) async {
-    await _repository.delete(id);
+    await _repository.deleteData(id);
   }
 
   @action
   update(TasksListModel model) async {
-    await _repository.update(model);
-  }
+    await _repository.updateData(model);
+  } */
 }

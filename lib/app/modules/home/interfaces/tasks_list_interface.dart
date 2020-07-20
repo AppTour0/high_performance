@@ -1,4 +1,4 @@
-import 'package:high_performance/app/modules/home/models/tasks_list_model.dart';
+import 'package:high_performance/app/modules/home/tasks_list_model.dart';
 
 abstract class ITasksListRepository {
   Future<int> insert(TasksListModel row);

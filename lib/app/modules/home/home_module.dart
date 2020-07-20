@@ -1,7 +1,3 @@
-import 'package:high_performance/app/modules/home/repositories/tasks_list_repository.dart';
-import 'package:high_performance/app/modules/tasks/tasks_module.dart';
-import 'package:high_performance/app/modules/tasks/tasks_page.dart';
-import 'package:high_performance/app/modules/tasks/tasks_repository.dart';
 import 'package:high_performance/app/modules/home/services/tasks_list_service.dart';
 import 'package:high_performance/app/modules/home/services/tasks_service.dart';
 import 'package:high_performance/app/modules/home/home_controller.dart';
@@ -13,8 +9,8 @@ import 'package:high_performance/app/modules/home/interfaces/tasks_interface.dar
 class HomeModule extends ChildModule {
   @override
   List<Bind> get binds => [
-        Bind((i) => TasksListRepository()),
-        Bind((i) => TasksRepository()),
+        //Bind((i) => TasksListRepository()),
+        //Bind((i) => TasksRepository()),
         Bind<ITasksListService>(
             (i) => TasksListService(tasksListRepository: i.get())),
         Bind<ITasksService>((i) => TasksService(tasksRepository: i.get())),

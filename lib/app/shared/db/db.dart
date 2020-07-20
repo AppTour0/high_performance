@@ -1,10 +1,9 @@
 import 'dart:io';
 
 import 'package:path/path.dart';
-import 'package:sqflite/sqflite.dart';
 import 'package:path_provider/path_provider.dart';
 
-class DatabaseHelper {
+/* class DatabaseHelper {
   static final _databaseName = "high_p.db";
   static final _databaseVersion = 1;
 // torna esta classe singleton
@@ -43,31 +42,48 @@ class DatabaseHelper {
   // Código SQL para criar o banco de dados e a tabela
   static Future _onCreate(Database db, int version) async {
     var sql = [
-      '''DROP TABLE IF EXISTS tasks;''',
-      '''DROP TABLE IF EXISTS tasks_list;''',
+      //'''DROP TABLE IF EXISTS tasks;''',
+      //'''DROP TABLE IF EXISTS tasks_list;''',
+
       '''create table if not exists tasks (
             id integer primary key autoincrement,
             name text,
-            date_modification datetime,
-            date_create datetime
+            date_create datetime,
+            date_modification datetime
             );''',
+
       '''create table if not exists tasks_list (
             id integer primary key autoincrement,
-            name text,
+            alarm integer,
+            mon integer,
+            tue integer,
+            wed integer,
+            thu integer,
+            fri integer,
+            sat integer,
+            sun integer,
+            amount integer,
+            time datetime,
+            description text,
             date_modification datetime,
             date_create datetime,
             task_id int NOT NULL,
             foreign key (task_id) references tasks (id) ON DELETE CASCADE
-            );''',
-      '''insert into tasks (name,date_create) values('Acordar cedo',strftime(datetime('now')));''',
-      '''insert into tasks (name,date_create) values('Ler livro',strftime(datetime('now')));''',
-      '''insert into tasks (name,date_create) values('Beber água',strftime(datetime('now')));''',
-      '''insert into tasks_list (date_create, task_id)
-                 values(strftime(datetime('now')),1);''',
-      '''insert into tasks_list (date_create, task_id)
-                 values(strftime(datetime('now')),2);''',
-      '''insert into tasks_list (date_create, task_id)
-                 values(strftime(datetime('now')),3);''',
+          );''',
+
+      '''insert into tasks (name,date_create, date_modification) values('Acordar cedo',strftime(datetime('now')), strftime(datetime('now')));''',
+      '''insert into tasks (name,date_create, date_modification) values('Ler livro',strftime(datetime('now')), strftime(datetime('now')));''',
+      '''insert into tasks (name,date_create, date_modification) values('Beber água',strftime(datetime('now')), strftime(datetime('now')));''',
+
+      '''insert into tasks_list (date_create, task_id, alarm, mon, tue, wed, thu, 
+                                fri, sat, sun, amount, time, description, date_modification)
+                 values(strftime(datetime('now')),1, 1, 1, 1, 1, 1, 0,
+                    1, 0, 1, strftime(datetime('now')), "Agradecer", strftime(datetime('now')));''',
+
+      '''insert into tasks_list (date_create, task_id, alarm, mon, tue, wed, thu, fri, sat, sun, amount, time, description, date_modification)
+                 values(strftime(datetime('now')),1, 1, 1, 1, 1, 1, 1, 1, 1, 2, strftime(datetime('now')), "Orar", strftime(datetime('now')));''',
+      '''insert into tasks_list (date_create, task_id, alarm, mon, tue, wed, thu, fri, sat, sun, amount, time, description, date_modification)
+                 values(strftime(datetime('now')),1, 0, 0, 0, 0, 0, 0, 0, 0, 0, strftime(datetime('now')), "", strftime(datetime('now')));''',
     ];
 
     for (var i = 0; i < sql.length; i++) {
@@ -76,3 +92,4 @@ class DatabaseHelper {
     }
   }
 }
+ */

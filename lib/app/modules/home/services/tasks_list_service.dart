@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_modular/flutter_modular.dart';
 import 'package:high_performance/app/modules/home/interfaces/tasks_list_interface.dart';
-import 'package:high_performance/app/modules/home/models/tasks_list_model.dart';
+import 'package:high_performance/app/modules/home/tasks_list_model.dart';
 
 class TasksListService extends Disposable implements ITasksListService {
   final ITasksListRepository tasksListRepository;
