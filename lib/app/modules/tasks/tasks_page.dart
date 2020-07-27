@@ -1,15 +1,14 @@
-import 'dart:isolate';
-
-import 'package:android_alarm_manager/android_alarm_manager.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:flutter_modular/flutter_modular.dart';
 import 'package:high_performance/app/components/choose_modal.dart';
 import 'package:high_performance/app/components/dialogs/input_dialog.dart';
+import 'package:high_performance/app/components/inputs.dart';
 import 'package:high_performance/app/modules/tasks/tasks_controller.dart';
 import 'package:high_performance/app/modules/tasks/tasks_module.dart';
 import 'package:high_performance/app/shared/db/database.dart';
+import 'package:high_performance/app/shared/utils/utils.dart';
+import 'package:high_performance/app/shared/utils/validators.dart';
 
 class TasksPage extends StatefulWidget {
   final String title;
@@ -25,12 +24,16 @@ class _TasksPageState extends State<TasksPage> {
   final controller = TasksModule.to.get<TasksController>();
   final ChooseModal chooseModal = ChooseModal();
   final InputDialog inputDialog = InputDialog();
+  final now = new DateTime.now();
   final _formKey = GlobalKey<FormState>();
-  FlutterLocalNotificationsPlugin localNotificationsPlugin =
-      FlutterLocalNotificationsPlugin();
+  Utils utils = Utils();
+  Validators validators = Validators();
 
-  String _date = "Not set";
-  String _time = "Not set";
+  String _date = "Selecione uma data";
+  String _time = "Selecione um horário";
+
+  String hintText;
+  String labelText;
 
   final int helloAlarmID = 0;
 
@@ -44,34 +47,29 @@ class _TasksPageState extends State<TasksPage> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          title: widget.id == 1
+          title: widget.id > 0
               ? Text("Editar " + widget.title)
               : Text("Adicionar " + widget.title),
           actions: <Widget>[
             Padding(
-              padding: const EdgeInsets.all(10),
+              padding: const EdgeInsets.fromLTRB(10, 0, 0, 0),
               child: IconButton(
                 icon: Icon(Icons.check),
                 onPressed: () {
                   save();
                 },
               ),
+            ),
+            Visibility(
+              visible: widget.id > 0,
+              child: IconButton(
+                icon: Icon(Icons.delete),
+                onPressed: () {
+                  delete();
+                },
+              ),
             )
           ],
-        ),
-        floatingActionButton: FloatingActionButton(
-          child: Icon(Icons.notifications),
-          onPressed: () async {
-            DateTime now = DateTime.now().toUtc().add(
-                  Duration(seconds: 10),
-                );
-            await singleNotification(
-              now,
-              "Notification",
-              "This is a notification",
-              98123871,
-            );
-          },
         ),
         body: Observer(builder: (context) {
           if (controller.taskList.data == null ||
@@ -88,17 +86,25 @@ class _TasksPageState extends State<TasksPage> {
                 dataList[0].taskList.idTask.toString();
             controller.taskEditing.text = dataList[0].task.name;
             controller.alarm = dataList[0].taskList.alarm;
-            controller.daysWeekCheck['mon'] = dataList[0].taskList.mon;
-            controller.daysWeekCheck['tue'] = dataList[0].taskList.tue;
-            controller.daysWeekCheck['wed'] = dataList[0].taskList.wed;
-            controller.daysWeekCheck['thu'] = dataList[0].taskList.thu;
-            controller.daysWeekCheck['fri'] = dataList[0].taskList.fri;
-            controller.daysWeekCheck['sat'] = dataList[0].taskList.sat;
-            controller.daysWeekCheck['sun'] = dataList[0].taskList.sun;
+            controller.daysOfWeek[1]['bool'] = dataList[0].taskList.mon;
+            controller.daysOfWeek[2]['bool'] = dataList[0].taskList.tue;
+            controller.daysOfWeek[3]['bool'] = dataList[0].taskList.wed;
+            controller.daysOfWeek[4]['bool'] = dataList[0].taskList.thu;
+            controller.daysOfWeek[5]['bool'] = dataList[0].taskList.fri;
+            controller.daysOfWeek[6]['bool'] = dataList[0].taskList.sat;
+            controller.daysOfWeek[0]['bool'] = dataList[0].taskList.sun;
             /* controller.taskEditing.text = controller.tasks
                 .where((element) => element.id == data.idTask)
                 .last
                 .name; */
+          }
+
+          if (controller.repeat) {
+            hintText = "Selecione um horário";
+            labelText = "Selecione um horário";
+          } else {
+            hintText = "Selecione uma data e hora";
+            labelText = "Selecione uma data e hora";
           }
 
           List<Map<String, dynamic>> list = [];
@@ -114,16 +120,91 @@ class _TasksPageState extends State<TasksPage> {
               child: Padding(
                 padding: const EdgeInsets.all(15),
                 child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
-                    task(list),
-                    addTask(list),
-                    daysOfWeek(),
-                    datePicker(),
+                    Row(
+                      children: <Widget>[
+                        Flexible(
+                          flex: 5,
+                          child: task(list),
+                        ),
+                        Flexible(
+                          child: addTask(list),
+                        ),
+                      ],
+                    ),
                     SizedBox(
                       height: 20.0,
                     ),
-                    timePicker(),
-                    alarmTest(),
+                    Row(
+                      children: <Widget>[
+                        Switch(
+                          value: controller.repeat,
+                          onChanged: (value) {
+                            controller.repeat = value;
+                            controller.switchBool(value);
+                          },
+                          activeTrackColor: Colors.blue[200],
+                          activeColor: Theme.of(context).accentColor,
+                        ),
+                        customText("Repetir"),
+                      ],
+                    ),
+                    AnimatedCrossFade(
+                      duration: const Duration(milliseconds: 400),
+                      firstChild: Container(
+                        height: 0,
+                      ),
+                      secondChild: Column(
+                        children: <Widget>[
+                          daysOfWeek(),
+                          SizedBox(
+                            height: 20.0,
+                          ),
+                        ],
+                      ),
+                      crossFadeState: !controller.repeat
+                          ? CrossFadeState.showFirst
+                          : CrossFadeState.showSecond,
+                    ),
+                    SizedBox(
+                      height: 20.0,
+                    ),
+                    CustomInput(
+                        editingController: controller.dateEditing,
+                        inputType: TextInputType.text,
+                        hintText: hintText,
+                        labelText: labelText,
+                        icon:
+                            controller.repeat ? Icons.date_range : Icons.timer,
+                        readOnly: true,
+                        suffixIcon: IconButton(
+                          icon: Icon(
+                            Icons.arrow_drop_down,
+                            color: Theme.of(context).accentColor,
+                            size: 30,
+                          ),
+                          onPressed: () {},
+                        ),
+                        validator: !controller.repeat
+                            ? validators.validateEmpty
+                            : validators.validateNotEmptyForm,
+                        onTap: () {
+                          controller.repeat
+                              ? _selectTime(context)
+                              : _selectDateTime(context)
+                                  .then((value) => _selectTime(context));
+                        }),
+                    SizedBox(
+                      height: 20.0,
+                    ),
+                    CustomInput(
+                        editingController: controller.messageEditing,
+                        inputType: TextInputType.text,
+                        hintText: 'Mensagem',
+                        labelText: 'Mensagem',
+                        icon: Icons.textsms,
+                        validator: validators.validateEmpty),
                   ],
                 ),
               ),
@@ -133,6 +214,15 @@ class _TasksPageState extends State<TasksPage> {
   }
 
   /* ==========================  Widgets ================================ */
+
+  Widget customText(String text) {
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Text(text,
+          style: TextStyle(
+              color: Colors.teal, fontWeight: FontWeight.bold, fontSize: 16)),
+    );
+  }
 
   Widget task(List<Map<String, dynamic>> list) {
     return Padding(
@@ -177,6 +267,8 @@ class _TasksPageState extends State<TasksPage> {
             textEditing: controller.nameTaskEditing);
       },
       icon: Icon(Icons.add_circle),
+      color: Theme.of(context).accentColor,
+      iconSize: 40,
     );
   }
 
@@ -191,7 +283,10 @@ class _TasksPageState extends State<TasksPage> {
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5.0)),
       elevation: 4.0,
       onPressed: () {
-        _selectDateTime(context);
+        _selectDateTime(context).then((value) => {
+              _date = value.toString(),
+              setState(() {}),
+            });
       },
       child: Container(
         alignment: Alignment.center,
@@ -222,7 +317,7 @@ class _TasksPageState extends State<TasksPage> {
               ],
             ),
             Text(
-              "  Change",
+              "  Alterar",
               style: TextStyle(
                   color: Colors.teal,
                   fontWeight: FontWeight.bold,
@@ -240,8 +335,11 @@ class _TasksPageState extends State<TasksPage> {
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5.0)),
       elevation: 4.0,
       onPressed: () {
-        _selectTime(context);
-        setState(() {});
+        _selectTime(context).then((value) => {
+              _time = value.toString(),
+              controller.timeOfDay = value,
+              setState(() {}),
+            });
       },
       child: Container(
         alignment: Alignment.center,
@@ -272,7 +370,7 @@ class _TasksPageState extends State<TasksPage> {
               ],
             ),
             Text(
-              "  Change",
+              "  Alterar",
               style: TextStyle(
                   color: Colors.teal,
                   fontWeight: FontWeight.bold,
@@ -288,79 +386,110 @@ class _TasksPageState extends State<TasksPage> {
   Widget alarmTest() {
     return RaisedButton(
         onPressed: () async {
-          await AndroidAlarmManager.periodic(
-              const Duration(minutes: 1), helloAlarmID, printHello);
+          /* await AndroidAlarmManager.periodic(
+              const Duration(minutes: 1), helloAlarmID, printHello); */
+          for (var i = 0; i < 10; i++) {
+            await controller.singleNotification(
+              DateTime(now.year, now.month, now.day, controller.timeOfDay.hour,
+                      controller.timeOfDay.minute)
+                  .add(Duration(minutes: i)),
+              "Beber Agua $i",
+              DateTime(now.year, now.month, now.day, controller.timeOfDay.hour,
+                      controller.timeOfDay.minute)
+                  .add(Duration(minutes: i))
+                  .toString(),
+              i + 1,
+            );
+          }
         },
         child: Text("Alarme"));
+  }
+
+  Widget buildItemCheck(Map<String, dynamic> map, int index) {
+    return Column(
+      children: <Widget>[
+        Observer(builder: (context) {
+          return RaisedButton(
+            shape: CircleBorder(
+                side: BorderSide(
+                    width: 2,
+                    color: Theme.of(context).accentColor,
+                    style: BorderStyle.solid)),
+            color: controller.daysOfWeek[index]['bool']
+                ? Colors.greenAccent
+                : Colors.grey[300],
+            onPressed: () {
+              controller.daysOfWeek[index]['bool'] =
+                  !controller.daysOfWeek[index]['bool'];
+              setState(() {});
+            },
+            child: Text(map['label'].substring(0, 1)),
+          );
+        }),
+      ],
+    );
   }
 
   Widget daysOfWeek() {
     List<Widget> items = new List<Widget>();
 
-    Widget buildItemCheck(String key, String value) {
-      return Observer(builder: (_) {
-        return Column(
-          children: <Widget>[
-            Text(value),
-            Checkbox(
-              value: controller.daysWeekCheck[key],
-              onChanged: (bool value) {
-                controller.daysWeekCheck[key] = value;
-              },
-            ),
-          ],
-        );
-      });
+    return Observer(builder: (context) {
+      for (var i = 0; i < controller.daysOfWeek.length; i++) {
+        items.add(buildItemCheck(controller.daysOfWeek[i], i));
+      }
 
-      /* return Expanded(child: Observer(builder: (_) {
-        return Column(children: <Widget>[
-          Text(value),
-          Checkbox(
-            value: controller.daysWeekCheck[key],
-            onChanged: (bool value) {
-              controller.daysWeekCheck[key] = value;
-            },
-          )
-        ]);
-      })); */
-    }
-
-    controller.daysWeek.forEach((key, value) {
-      items.add(buildItemCheck(key, value));
-    });
-
-    for (var item in items)
       return Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         mainAxisSize: MainAxisSize.max,
         children: <Widget>[
-          Expanded(child: item),
+          for (var item in items) Expanded(child: item),
         ],
       );
+    });
   }
 
   /* =========================== Functions ================================ */
 
-  save() async {
+  Future<void> save() async {
     List<TasksListWithTask> dataList = controller.taskList.data;
     final form = _formKey.currentState;
     if (form.validate()) {
       form.save();
       await controller
-          .submitList(
-            dataList,
-
-            /* onError: (title, description) async {
-
-            },
-            onSuccess: (title, description) async {
-              
-            } */
-          )
+          .submitList(dataList,
+              onError: (title, description) async {}, onSuccess: () async {})
           .then(
+            //alarmTest();
             (value) => Modular.to.pop(),
           );
     }
+  }
+
+  delete() async {
+    String title = "Atenção!!!";
+    String value = "Deseja realente excluir esta tarefa?";
+    utils
+        .asyncConfirmDialog(
+            context: context, title: title, value: value, color: Colors.red)
+        .then((value) => {
+              if (value.index == 1)
+                {
+                  controller.delete(
+                    widget.id,
+                    onError: (title, description) => utils.flushBarDanger(
+                        context: context,
+                        title: title,
+                        description: description),
+                    onSuccess: () {
+                      Modular.to.pop();
+                      utils.flushBarSuccess(
+                          context: context,
+                          title: "Sucesso!",
+                          description: "Tarefa deletada com sucesso.");
+                    },
+                  )
+                }
+            });
   }
 
   Future<TimeOfDay> _selectTime(BuildContext context) {
@@ -372,34 +501,12 @@ class _TasksPageState extends State<TasksPage> {
     );
   }
 
-  Future<DateTime> _selectDateTime(BuildContext context) => showDatePicker(
-        context: context,
-        initialDate: DateTime.now().add(Duration(seconds: 1)),
-        firstDate: DateTime.now(),
-        lastDate: DateTime(2100),
-      );
-
-  Future singleNotification(
-      DateTime datetime, String message, String subtext, int hashcode,
-      {String sound}) async {
-    var androidChannel = AndroidNotificationDetails(
-      'channel-id',
-      'channel-name',
-      'channel-description',
-      importance: Importance.Max,
-      priority: Priority.Max,
+  Future<DateTime> _selectDateTime(BuildContext context) {
+    return showDatePicker(
+      context: context,
+      initialDate: DateTime.now().add(Duration(seconds: 1)),
+      firstDate: DateTime.now(),
+      lastDate: DateTime(2100),
     );
-
-    var iosChannel = IOSNotificationDetails();
-    var platformChannel = NotificationDetails(androidChannel, iosChannel);
-    localNotificationsPlugin.schedule(
-        hashcode, message, subtext, datetime, platformChannel,
-        payload: hashcode.toString());
-  }
-
-  void printHello() {
-    final DateTime now = DateTime.now();
-    final int isolateId = Isolate.current.hashCode;
-    print("[$now] Hello, world! isolate=${isolateId} function='$printHello'");
   }
 }

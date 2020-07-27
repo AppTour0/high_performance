@@ -309,6 +309,7 @@ class TasksListData extends DataClass implements Insertable<TasksListData> {
   final bool fri;
   final bool sat;
   final bool sun;
+  final DateTime dateTimeNotification;
   final DateTime dateCreate;
   final DateTime dateModify;
   TasksListData(
@@ -322,6 +323,7 @@ class TasksListData extends DataClass implements Insertable<TasksListData> {
       @required this.fri,
       @required this.sat,
       @required this.sun,
+      @required this.dateTimeNotification,
       @required this.dateCreate,
       @required this.dateModify});
   factory TasksListData.fromData(
@@ -343,6 +345,8 @@ class TasksListData extends DataClass implements Insertable<TasksListData> {
       fri: boolType.mapFromDatabaseResponse(data['${effectivePrefix}fri']),
       sat: boolType.mapFromDatabaseResponse(data['${effectivePrefix}sat']),
       sun: boolType.mapFromDatabaseResponse(data['${effectivePrefix}sun']),
+      dateTimeNotification: dateTimeType.mapFromDatabaseResponse(
+          data['${effectivePrefix}date_time_notification']),
       dateCreate: dateTimeType
           .mapFromDatabaseResponse(data['${effectivePrefix}date_create']),
       dateModify: dateTimeType
@@ -382,6 +386,9 @@ class TasksListData extends DataClass implements Insertable<TasksListData> {
     if (!nullToAbsent || sun != null) {
       map['sun'] = Variable<bool>(sun);
     }
+    if (!nullToAbsent || dateTimeNotification != null) {
+      map['date_time_notification'] = Variable<DateTime>(dateTimeNotification);
+    }
     if (!nullToAbsent || dateCreate != null) {
       map['date_create'] = Variable<DateTime>(dateCreate);
     }
@@ -405,6 +412,9 @@ class TasksListData extends DataClass implements Insertable<TasksListData> {
       fri: fri == null && nullToAbsent ? const Value.absent() : Value(fri),
       sat: sat == null && nullToAbsent ? const Value.absent() : Value(sat),
       sun: sun == null && nullToAbsent ? const Value.absent() : Value(sun),
+      dateTimeNotification: dateTimeNotification == null && nullToAbsent
+          ? const Value.absent()
+          : Value(dateTimeNotification),
       dateCreate: dateCreate == null && nullToAbsent
           ? const Value.absent()
           : Value(dateCreate),
@@ -428,6 +438,8 @@ class TasksListData extends DataClass implements Insertable<TasksListData> {
       fri: serializer.fromJson<bool>(json['fri']),
       sat: serializer.fromJson<bool>(json['sat']),
       sun: serializer.fromJson<bool>(json['sun']),
+      dateTimeNotification:
+          serializer.fromJson<DateTime>(json['dateTimeNotification']),
       dateCreate: serializer.fromJson<DateTime>(json['dateCreate']),
       dateModify: serializer.fromJson<DateTime>(json['dateModify']),
     );
@@ -446,6 +458,7 @@ class TasksListData extends DataClass implements Insertable<TasksListData> {
       'fri': serializer.toJson<bool>(fri),
       'sat': serializer.toJson<bool>(sat),
       'sun': serializer.toJson<bool>(sun),
+      'dateTimeNotification': serializer.toJson<DateTime>(dateTimeNotification),
       'dateCreate': serializer.toJson<DateTime>(dateCreate),
       'dateModify': serializer.toJson<DateTime>(dateModify),
     };
@@ -462,6 +475,7 @@ class TasksListData extends DataClass implements Insertable<TasksListData> {
           bool fri,
           bool sat,
           bool sun,
+          DateTime dateTimeNotification,
           DateTime dateCreate,
           DateTime dateModify}) =>
       TasksListData(
@@ -475,6 +489,7 @@ class TasksListData extends DataClass implements Insertable<TasksListData> {
         fri: fri ?? this.fri,
         sat: sat ?? this.sat,
         sun: sun ?? this.sun,
+        dateTimeNotification: dateTimeNotification ?? this.dateTimeNotification,
         dateCreate: dateCreate ?? this.dateCreate,
         dateModify: dateModify ?? this.dateModify,
       );
@@ -491,6 +506,7 @@ class TasksListData extends DataClass implements Insertable<TasksListData> {
           ..write('fri: $fri, ')
           ..write('sat: $sat, ')
           ..write('sun: $sun, ')
+          ..write('dateTimeNotification: $dateTimeNotification, ')
           ..write('dateCreate: $dateCreate, ')
           ..write('dateModify: $dateModify')
           ..write(')'))
@@ -518,8 +534,12 @@ class TasksListData extends DataClass implements Insertable<TasksListData> {
                                       sat.hashCode,
                                       $mrjc(
                                           sun.hashCode,
-                                          $mrjc(dateCreate.hashCode,
-                                              dateModify.hashCode))))))))))));
+                                          $mrjc(
+                                              dateTimeNotification.hashCode,
+                                              $mrjc(
+                                                  dateCreate.hashCode,
+                                                  dateModify
+                                                      .hashCode)))))))))))));
   @override
   bool operator ==(dynamic other) =>
       identical(this, other) ||
@@ -534,6 +554,7 @@ class TasksListData extends DataClass implements Insertable<TasksListData> {
           other.fri == this.fri &&
           other.sat == this.sat &&
           other.sun == this.sun &&
+          other.dateTimeNotification == this.dateTimeNotification &&
           other.dateCreate == this.dateCreate &&
           other.dateModify == this.dateModify);
 }
@@ -549,6 +570,7 @@ class TasksListCompanion extends UpdateCompanion<TasksListData> {
   final Value<bool> fri;
   final Value<bool> sat;
   final Value<bool> sun;
+  final Value<DateTime> dateTimeNotification;
   final Value<DateTime> dateCreate;
   final Value<DateTime> dateModify;
   const TasksListCompanion({
@@ -562,6 +584,7 @@ class TasksListCompanion extends UpdateCompanion<TasksListData> {
     this.fri = const Value.absent(),
     this.sat = const Value.absent(),
     this.sun = const Value.absent(),
+    this.dateTimeNotification = const Value.absent(),
     this.dateCreate = const Value.absent(),
     this.dateModify = const Value.absent(),
   });
@@ -576,9 +599,11 @@ class TasksListCompanion extends UpdateCompanion<TasksListData> {
     this.fri = const Value.absent(),
     this.sat = const Value.absent(),
     this.sun = const Value.absent(),
+    @required DateTime dateTimeNotification,
     @required DateTime dateCreate,
     @required DateTime dateModify,
   })  : idTask = Value(idTask),
+        dateTimeNotification = Value(dateTimeNotification),
         dateCreate = Value(dateCreate),
         dateModify = Value(dateModify);
   static Insertable<TasksListData> custom({
@@ -592,6 +617,7 @@ class TasksListCompanion extends UpdateCompanion<TasksListData> {
     Expression<bool> fri,
     Expression<bool> sat,
     Expression<bool> sun,
+    Expression<DateTime> dateTimeNotification,
     Expression<DateTime> dateCreate,
     Expression<DateTime> dateModify,
   }) {
@@ -606,6 +632,8 @@ class TasksListCompanion extends UpdateCompanion<TasksListData> {
       if (fri != null) 'fri': fri,
       if (sat != null) 'sat': sat,
       if (sun != null) 'sun': sun,
+      if (dateTimeNotification != null)
+        'date_time_notification': dateTimeNotification,
       if (dateCreate != null) 'date_create': dateCreate,
       if (dateModify != null) 'date_modify': dateModify,
     });
@@ -622,6 +650,7 @@ class TasksListCompanion extends UpdateCompanion<TasksListData> {
       Value<bool> fri,
       Value<bool> sat,
       Value<bool> sun,
+      Value<DateTime> dateTimeNotification,
       Value<DateTime> dateCreate,
       Value<DateTime> dateModify}) {
     return TasksListCompanion(
@@ -635,6 +664,7 @@ class TasksListCompanion extends UpdateCompanion<TasksListData> {
       fri: fri ?? this.fri,
       sat: sat ?? this.sat,
       sun: sun ?? this.sun,
+      dateTimeNotification: dateTimeNotification ?? this.dateTimeNotification,
       dateCreate: dateCreate ?? this.dateCreate,
       dateModify: dateModify ?? this.dateModify,
     );
@@ -673,6 +703,10 @@ class TasksListCompanion extends UpdateCompanion<TasksListData> {
     if (sun.present) {
       map['sun'] = Variable<bool>(sun.value);
     }
+    if (dateTimeNotification.present) {
+      map['date_time_notification'] =
+          Variable<DateTime>(dateTimeNotification.value);
+    }
     if (dateCreate.present) {
       map['date_create'] = Variable<DateTime>(dateCreate.value);
     }
@@ -695,6 +729,7 @@ class TasksListCompanion extends UpdateCompanion<TasksListData> {
           ..write('fri: $fri, ')
           ..write('sat: $sat, ')
           ..write('sun: $sun, ')
+          ..write('dateTimeNotification: $dateTimeNotification, ')
           ..write('dateCreate: $dateCreate, ')
           ..write('dateModify: $dateModify')
           ..write(')'))
@@ -797,6 +832,20 @@ class $TasksListTable extends TasksList
         defaultValue: const Constant(false));
   }
 
+  final VerificationMeta _dateTimeNotificationMeta =
+      const VerificationMeta('dateTimeNotification');
+  GeneratedDateTimeColumn _dateTimeNotification;
+  @override
+  GeneratedDateTimeColumn get dateTimeNotification =>
+      _dateTimeNotification ??= _constructDateTimeNotification();
+  GeneratedDateTimeColumn _constructDateTimeNotification() {
+    return GeneratedDateTimeColumn(
+      'date_time_notification',
+      $tableName,
+      false,
+    );
+  }
+
   final VerificationMeta _dateCreateMeta = const VerificationMeta('dateCreate');
   GeneratedDateTimeColumn _dateCreate;
   @override
@@ -835,6 +884,7 @@ class $TasksListTable extends TasksList
         fri,
         sat,
         sun,
+        dateTimeNotification,
         dateCreate,
         dateModify
       ];
@@ -889,6 +939,14 @@ class $TasksListTable extends TasksList
     if (data.containsKey('sun')) {
       context.handle(
           _sunMeta, sun.isAcceptableOrUnknown(data['sun'], _sunMeta));
+    }
+    if (data.containsKey('date_time_notification')) {
+      context.handle(
+          _dateTimeNotificationMeta,
+          dateTimeNotification.isAcceptableOrUnknown(
+              data['date_time_notification'], _dateTimeNotificationMeta));
+    } else if (isInserting) {
+      context.missing(_dateTimeNotificationMeta);
     }
     if (data.containsKey('date_create')) {
       context.handle(

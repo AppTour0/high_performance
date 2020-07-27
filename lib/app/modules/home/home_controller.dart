@@ -1,7 +1,4 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:high_performance/app/modules/home/interfaces/tasks_list_interface.dart';
-import 'package:high_performance/app/modules/home/tasks_list_model.dart';
 import 'package:high_performance/app/shared/db/database.dart';
 import 'package:mobx/mobx.dart';
 
@@ -29,12 +26,22 @@ abstract class _HomeBase with Store {
   }
 
   @observable
+  List<Map<String, dynamic>> daysOfWeek = [
+    {'day': 'sun', 'label': 'Domingo', 'bool': false},
+    {'day': 'mon', 'label': 'Segunda', 'bool': false},
+    {'day': 'tue', 'label': 'Terça', 'bool': false},
+    {'day': 'wed', 'label': 'Quarta', 'bool': false},
+    {'day': 'thu', 'label': 'Quinta', 'bool': false},
+    {'day': 'fri', 'label': 'Sexta', 'bool': false},
+    {'day': 'sat', 'label': 'Sabado', 'bool': false},
+  ];
+
+  @observable
   ObservableStream<List<TasksListWithTask>> tasksList;
 
   @action
   getList() {
-    var teste = _repository.getTasksList().asObservable();
-    tasksList = teste;
+    tasksList = _repository.getTasksList().asObservable();
   }
 
   /* 

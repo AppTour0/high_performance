@@ -25,6 +25,7 @@ class TasksList extends Table {
   BoolColumn get fri => boolean().withDefault(const Constant(false))();
   BoolColumn get sat => boolean().withDefault(const Constant(false))();
   BoolColumn get sun => boolean().withDefault(const Constant(false))();
+  DateTimeColumn get dateTimeNotification => dateTime()();
   DateTimeColumn get dateCreate => dateTime()();
   DateTimeColumn get dateModify => dateTime()();
 
@@ -86,9 +87,11 @@ class Database extends _$Database {
   MigrationStrategy get migration => MigrationStrategy(
         beforeOpen: (details) async {
           await customStatement('PRAGMA foreign_keys = ON');
-          tasksInit.forEach((element) async {
-            await tasksRepository.insertData(element);
-          });
+          if (details.wasCreated) {
+            tasksInit.forEach((element) async {
+              await tasksRepository.insertData(element);
+            });
+          }
         },
       );
 }

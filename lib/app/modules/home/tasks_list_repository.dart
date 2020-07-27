@@ -48,12 +48,18 @@ class TasksListRepository extends DatabaseAccessor<Database>
             ).toList());
   }
 
-  Future insertData(Insertable<TasksListData> task) =>
-      into(tasksList).insert(task);
+  /* Future insertData(Insertable<TasksListData> task) =>
+      into(tasksList).insert(task); */
+  Future insertData(TasksListData task) async {
+    return await into(tasksList).insert(task);
+  }
+
   Future updateData(Insertable<TasksListData> task) =>
       update(tasksList).replace(task);
-  Future deleteData(Insertable<TasksListData> task) =>
-      delete(tasksList).delete(task);
+  Future deleteData(int id) {
+    return (delete(tasksList)..where((tasksList) => tasksList.id.equals(id)))
+        .go();
+  }
 }
 
 /* @UseDao(tables: [TasksList, Tasks])

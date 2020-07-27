@@ -4,8 +4,6 @@ import 'package:high_performance/app/components/custom_tile/custom_tile.dart';
 import 'package:high_performance/app/components/custom_tile/tile_model.dart';
 import 'package:high_performance/app/modules/home/home_controller.dart';
 import 'package:high_performance/app/modules/home/home_module.dart';
-import 'package:high_performance/app/modules/tasks/alarm.dart';
-import 'package:high_performance/app/modules/tasks/tasks_model.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:high_performance/app/shared/db/database.dart';
 import 'package:intl/intl.dart';
@@ -20,10 +18,13 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   final controller = HomeModule.to.get<HomeController>();
-  List<TasksModel> task;
 
   void initState() {
     super.initState();
+  }
+
+  setStateCustom() {
+    setState(() {});
   }
 
   @override
@@ -50,7 +51,8 @@ class _HomePageState extends State<HomePage> {
           onPressed: () async {
             await Modular.to
                 .pushNamed("/tasks", arguments: 0)
-                .whenComplete(() => controller.getList());
+                .then((value) => setStateCustom());
+            //.whenComplete(() => controller.getList());
           },
           child: Icon(Icons.add),
         ),
@@ -66,14 +68,53 @@ class _HomePageState extends State<HomePage> {
               return Center(child: Text("Não há tarefas"));
             }
 
+            List<String> days = [];
+
             List<TileModel> tileModel = List.generate(
               data.length,
               (i) {
+                days.clear();
+                data[i].taskList.sun
+                    ? days.add(controller.daysOfWeek[0]['label']
+                        .toString()
+                        .substring(0, 3))
+                    : null;
+                data[i].taskList.mon
+                    ? days.add(controller.daysOfWeek[1]['label']
+                        .toString()
+                        .substring(0, 3))
+                    : null;
+                data[i].taskList.tue
+                    ? days.add(controller.daysOfWeek[2]['label']
+                        .toString()
+                        .substring(0, 3))
+                    : null;
+                data[i].taskList.wed
+                    ? days.add(controller.daysOfWeek[3]['label']
+                        .toString()
+                        .substring(0, 3))
+                    : null;
+                data[i].taskList.thu
+                    ? days.add(controller.daysOfWeek[4]['label']
+                        .toString()
+                        .substring(0, 3))
+                    : null;
+                data[i].taskList.fri
+                    ? days.add(controller.daysOfWeek[5]['label']
+                        .toString()
+                        .substring(0, 3))
+                    : null;
+                data[i].taskList.sat
+                    ? days.add(controller.daysOfWeek[6]['label']
+                        .toString()
+                        .substring(0, 3))
+                    : null;
                 return TileModel(
                     id: data[i].taskList.id,
                     title: data[i].task.name,
-                    subtitle:
-                        DateFormat.yMd().format(DateTime.now()).toString());
+                    //subtitle: DateFormat.yMd().format(DateTime.now()).toString()
+                    subtitle: "Repetir: " +
+                        days.toString().replaceAll(RegExp(r"(\[)|(\])"), ''));
               },
             );
 
@@ -82,7 +123,7 @@ class _HomePageState extends State<HomePage> {
               child: CustomTile(
                 list: tileModel,
                 route: "/tasks",
-                tapAction: controller.getList(),
+                //tapAction: controller.getList(),
               ),
             );
           },
