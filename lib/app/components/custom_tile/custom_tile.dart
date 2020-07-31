@@ -14,31 +14,44 @@ class CustomTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ListView.separated(
-      separatorBuilder: (context, index) => Divider(
+    return ListView.builder(
+      /* separatorBuilder: (context, index) => Divider(
         color: Colors.grey[400],
         height: 0,
-      ),
+      ), */
       shrinkWrap: true,
       itemCount: list.length,
       itemBuilder: (BuildContext ctxt, int index) {
-        return Center(
-            child: Column(
-          children: <Widget>[
-            ListTile(
-              title:
-                  Text(list[index].id.toString() + " - " + list[index].title),
-              subtitle: Text(list[index].subtitle),
-              onTap: () {
-                route != null
-                    ? Modular.to
-                        .pushNamed(route, arguments: list[index].id)
-                        .then((value) => tapAction)
-                    : null;
-              },
+        return Padding(
+          padding: const EdgeInsets.all(5),
+          child: Container(
+            padding: const EdgeInsets.fromLTRB(0, 5, 0, 5),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(5),
+              color: Colors.cyan[100],
             ),
-          ],
-        ));
+            child: Column(
+              children: <Widget>[
+                ListTile(
+                  title: list[index].title,
+                  subtitle: Column(
+                    children: <Widget>[
+                      for (var item in list[index].subtitle) item
+                    ],
+                  ),
+                  trailing: Icon(Icons.keyboard_arrow_right),
+                  onTap: () {
+                    route != null
+                        ? Modular.to
+                            .pushNamed(route, arguments: list[index].id)
+                            .then((value) => tapAction)
+                        : null;
+                  },
+                ),
+              ],
+            ),
+          ),
+        );
       },
     );
   }

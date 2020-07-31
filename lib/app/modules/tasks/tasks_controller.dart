@@ -6,6 +6,7 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:high_performance/app/shared/db/database.dart';
 import 'package:mobx/mobx.dart';
 import 'package:intl/intl.dart';
+import 'package:high_performance/app/shared/utils/notifications/receive_notification.dart';
 
 part 'tasks_controller.g.dart';
 
@@ -14,8 +15,7 @@ class TasksController = _TasksBase with _$TasksController;
 abstract class _TasksBase with Store {
   final _repository = Database.instance.tasksRepository;
   final _listRepository = Database.instance.tasksListRepository;
-  FlutterLocalNotificationsPlugin localNotificationsPlugin =
-      FlutterLocalNotificationsPlugin();
+  VariablesNotification vars = VariablesNotification();
   String title = "Atenção!!!";
 
   @observable
@@ -42,40 +42,24 @@ abstract class _TasksBase with Store {
   @observable
   bool alarm = false;
 
-  _TasksBase() {
-    getTasks();
-  }
-
   TextEditingController taskEditing = TextEditingController();
-  TextEditingController idTaskEditing = TextEditingController();
   TextEditingController nameTaskEditing = TextEditingController();
   DateFormat timeFomrat;
   TextEditingController timeEditing = TextEditingController();
   DateFormat dateFomrat;
   TextEditingController dateEditing = TextEditingController();
   TextEditingController messageEditing = TextEditingController(text: "");
-  int idTaskList = 0;
+  int idTask = 0;
+
+  DateTime datetimeToDb;
 
   @observable
-  ObservableStream<List<dynamic>> tasks;
-
-  @action
-  getTasks() {
-    tasks = _repository.getTasks().asObservable();
-  }
-
-  @observable
-  ObservableStream<List<TasksListWithTask>> taskList;
+  ObservableStream<List<Task>> task;
 
   @action
   getTask(int id) {
-    taskList = _listRepository.getTasksListById(id).asObservable();
+    task = _listRepository.getTaskById(id).asObservable();
   }
-
-  @observable
-  DateFormat dateOnlyFormat = DateFormat('dd/mm/yyyy');
-  @observable
-  DateFormat timeOnlyFormat = DateFormat('hh:mm');
 
   DateTime dateTimeNotification;
   TimeOfDay timeOfDay;
@@ -89,12 +73,15 @@ abstract class _TasksBase with Store {
 
     var androidChannel = AndroidNotificationDetails(
         'channel-id', 'channel-name', 'channel-description',
+        //sound: RawResourceAndroidNotificationSound('slow_spring_board'),
+        //largeIcon: DrawableResourceAndroidBitmap('sample_large_icon'),
         importance: Importance.Max,
         priority: Priority.Max,
         vibrationPattern: vibrationPattern,
         enableLights: true,
-        color: const Color.fromARGB(255, 255, 0, 0),
-        ledColor: const Color.fromARGB(255, 255, 0, 0),
+        icon: "app_icon",
+        color: const Color.fromARGB(0, 255, 130, 0),
+        ledColor: const Color.fromARGB(0, 255, 130, 0),
         ledOnMs: 1000,
         ledOffMs: 500);
 
@@ -109,7 +96,7 @@ abstract class _TasksBase with Store {
     var platformChannel =
         NotificationDetails(alarmConfigurations(), iosChannel);
 
-    localNotificationsPlugin.schedule(
+    vars.flutterLocalNotificationsPlugin.schedule(
         hashcode, message, subtext, datetime, platformChannel,
         payload: hashcode.toString());
   }
@@ -118,19 +105,19 @@ abstract class _TasksBase with Store {
   Future dailyNotification(
       DateTime datetime, String message, String subtext, int hashcode,
       {String sound}) async {
-    Time time = Time(timeOfDay.hour, timeOfDay.minute);
+    Time time = Time(datetime.hour, datetime.minute);
 
     var iosChannel = IOSNotificationDetails();
     var platformChannel =
         NotificationDetails(alarmConfigurations(), iosChannel);
 
-    localNotificationsPlugin.showDailyAtTime(
+    await vars.flutterLocalNotificationsPlugin.showDailyAtTime(
         hashcode, message, subtext, time, platformChannel,
         payload: hashcode.toString());
   }
 
-  @action
-  submitTask(List<TasksListWithTask> data) async {
+  /* @action
+  submitTask(List<Task> data) async {
     if (data.length == 0) {
       Task model = Task(
         id: null,
@@ -144,16 +131,16 @@ abstract class _TasksBase with Store {
           .task
           .copyWith(name: nameTaskEditing.text, dateModify: DateTime.now()));
     }
-  }
+  } */
 
   @action
-  Future<void> submitList(List<TasksListWithTask> data,
+  Future<void> submitTask(List<Task> data,
       {Future<VoidCallback> onError(String title, String description),
       Future<VoidCallback> onSuccess()}) async {
     if (data.length == 0) {
-      TasksListData model = TasksListData(
+      Task model = Task(
         id: null,
-        idTask: int.tryParse(idTaskEditing.text),
+        name: taskEditing.text,
         alarm: false,
         sun: daysOfWeek[0]['bool'],
         mon: daysOfWeek[1]['bool'],
@@ -162,7 +149,10 @@ abstract class _TasksBase with Store {
         thu: daysOfWeek[4]['bool'],
         fri: daysOfWeek[5]['bool'],
         sat: daysOfWeek[6]['bool'],
-        dateTimeNotification: DateTime.now().add(Duration(seconds: 10)),
+        dateTimeNotification: datetimeToDb,
+        message: messageEditing.text,
+        repeat: repeat,
+        unique: false,
         dateModify: DateTime.now(),
         dateCreate: DateTime.now(),
       );
@@ -175,8 +165,8 @@ abstract class _TasksBase with Store {
               });
     } else {
       await _listRepository
-          .updateData(data[0].taskList.copyWith(
-              idTask: int.tryParse(idTaskEditing.text),
+          .updateData(data[0].copyWith(
+              name: taskEditing.text,
               sun: daysOfWeek[0]['bool'],
               mon: daysOfWeek[1]['bool'],
               tue: daysOfWeek[2]['bool'],
@@ -184,9 +174,13 @@ abstract class _TasksBase with Store {
               thu: daysOfWeek[4]['bool'],
               fri: daysOfWeek[5]['bool'],
               sat: daysOfWeek[6]['bool'],
+              message: messageEditing.text,
+              repeat: repeat,
+              dateTimeNotification: datetimeToDb,
               dateModify: DateTime.now()))
-          .then((value) => localNotificationsPlugin.cancel(data[0].taskList.id))
-          .then((value) => notification(data[0].taskList.id))
+          .then((value) =>
+              vars.flutterLocalNotificationsPlugin.cancel(data[0].id))
+          .then((value) => notification(data[0].id))
           .then((value) => onSuccess())
           .catchError((error) => {
                 onError(title, error),
@@ -196,11 +190,11 @@ abstract class _TasksBase with Store {
 
   Future notification(value) async {
     if (repeat) {
-      return dailyNotification(DateTime.tryParse(dateEditing.text),
-          taskEditing.text, messageEditing.text, value);
+      return dailyNotification(
+          datetimeToDb, taskEditing.text, messageEditing.text, value);
     } else {
-      singleNotification(DateTime.tryParse(dateEditing.text), taskEditing.text,
-          messageEditing.text, value);
+      singleNotification(
+          datetimeToDb, taskEditing.text, messageEditing.text, value);
     }
   }
 
@@ -211,7 +205,8 @@ abstract class _TasksBase with Store {
     try {
       await _listRepository
           .deleteData(id)
-          .then((value) => {localNotificationsPlugin.cancel(id), onSuccess()})
+          .then((value) =>
+              {vars.flutterLocalNotificationsPlugin.cancel(id), onSuccess()})
           .catchError((error) => {
                 onError(title, error),
               });

@@ -54,63 +54,18 @@ mixin _$TasksController on _TasksBase, Store {
     });
   }
 
-  final _$tasksAtom = Atom(name: '_TasksBase.tasks');
+  final _$taskAtom = Atom(name: '_TasksBase.task');
 
   @override
-  ObservableStream<List<dynamic>> get tasks {
-    _$tasksAtom.reportRead();
-    return super.tasks;
+  ObservableStream<List<Task>> get task {
+    _$taskAtom.reportRead();
+    return super.task;
   }
 
   @override
-  set tasks(ObservableStream<List<dynamic>> value) {
-    _$tasksAtom.reportWrite(value, super.tasks, () {
-      super.tasks = value;
-    });
-  }
-
-  final _$taskListAtom = Atom(name: '_TasksBase.taskList');
-
-  @override
-  ObservableStream<List<TasksListWithTask>> get taskList {
-    _$taskListAtom.reportRead();
-    return super.taskList;
-  }
-
-  @override
-  set taskList(ObservableStream<List<TasksListWithTask>> value) {
-    _$taskListAtom.reportWrite(value, super.taskList, () {
-      super.taskList = value;
-    });
-  }
-
-  final _$dateOnlyFormatAtom = Atom(name: '_TasksBase.dateOnlyFormat');
-
-  @override
-  DateFormat get dateOnlyFormat {
-    _$dateOnlyFormatAtom.reportRead();
-    return super.dateOnlyFormat;
-  }
-
-  @override
-  set dateOnlyFormat(DateFormat value) {
-    _$dateOnlyFormatAtom.reportWrite(value, super.dateOnlyFormat, () {
-      super.dateOnlyFormat = value;
-    });
-  }
-
-  final _$timeOnlyFormatAtom = Atom(name: '_TasksBase.timeOnlyFormat');
-
-  @override
-  DateFormat get timeOnlyFormat {
-    _$timeOnlyFormatAtom.reportRead();
-    return super.timeOnlyFormat;
-  }
-
-  @override
-  set timeOnlyFormat(DateFormat value) {
-    _$timeOnlyFormatAtom.reportWrite(value, super.timeOnlyFormat, () {
-      super.timeOnlyFormat = value;
+  set task(ObservableStream<List<Task>> value) {
+    _$taskAtom.reportWrite(value, super.task, () {
+      super.task = value;
     });
   }
 
@@ -140,18 +95,11 @@ mixin _$TasksController on _TasksBase, Store {
   final _$submitTaskAsyncAction = AsyncAction('_TasksBase.submitTask');
 
   @override
-  Future submitTask(List<TasksListWithTask> data) {
-    return _$submitTaskAsyncAction.run(() => super.submitTask(data));
-  }
-
-  final _$submitListAsyncAction = AsyncAction('_TasksBase.submitList');
-
-  @override
-  Future<void> submitList(List<TasksListWithTask> data,
+  Future<void> submitTask(List<dynamic> data,
       {Future<VoidCallback> Function(String, String) onError,
       Future<VoidCallback> Function() onSuccess}) {
-    return _$submitListAsyncAction.run(
-        () => super.submitList(data, onError: onError, onSuccess: onSuccess));
+    return _$submitTaskAsyncAction.run(
+        () => super.submitTask(data, onError: onError, onSuccess: onSuccess));
   }
 
   final _$deleteAsyncAction = AsyncAction('_TasksBase.delete');
@@ -178,17 +126,6 @@ mixin _$TasksController on _TasksBase, Store {
   }
 
   @override
-  dynamic getTasks() {
-    final _$actionInfo =
-        _$_TasksBaseActionController.startAction(name: '_TasksBase.getTasks');
-    try {
-      return super.getTasks();
-    } finally {
-      _$_TasksBaseActionController.endAction(_$actionInfo);
-    }
-  }
-
-  @override
   dynamic getTask(int id) {
     final _$actionInfo =
         _$_TasksBaseActionController.startAction(name: '_TasksBase.getTask');
@@ -205,10 +142,7 @@ mixin _$TasksController on _TasksBase, Store {
 daysOfWeek: ${daysOfWeek},
 repeat: ${repeat},
 alarm: ${alarm},
-tasks: ${tasks},
-taskList: ${taskList},
-dateOnlyFormat: ${dateOnlyFormat},
-timeOnlyFormat: ${timeOnlyFormat}
+task: ${task}
     ''';
   }
 }

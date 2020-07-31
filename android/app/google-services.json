@@ -1,0 +1,144 @@
+{
+  "project_info": {
+    "project_number": "464570700462",
+    "firebase_url": "https://appturismo-cb8fa.firebaseio.com",
+    "project_id": "appturismo-cb8fa",
+    "storage_bucket": "appturismo-cb8fa.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:464570700462:android:650c94573e258084",
+        "android_client_info": {
+          "package_name": "com.example.apptour"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "464570700462-sdmnnfs4755b36md9s0afi54kpfonf7k.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.apptour",
+            "certificate_hash": "a3269206e8aa3a23da197e7f73a5958e06942c78"
+          }
+        },
+        {
+          "client_id": "464570700462-9f39clefk8hsnlr7dpc14fdemdfh6u62.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.apptour",
+            "certificate_hash": "f08da13f85c6db6de4a0b675e1dd5726837c0a32"
+          }
+        },
+        {
+          "client_id": "464570700462-2leg9qm8ugkga6vlav8e4s8hj1atmgd7.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDHOn-Eul80LsfGfZGVtr0HHNhHiWu8YE0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "464570700462-2leg9qm8ugkga6vlav8e4s8hj1atmgd7.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "464570700462-r13piha6dst5fqv5huretksk408i7ulb.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.gezi"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:464570700462:android:4c6ea6f0e22c06e209933f",
+        "android_client_info": {
+          "package_name": "com.gezi"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "464570700462-t7fisjunt2lijhroq9g4990drr8j2fh5.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.gezi",
+            "certificate_hash": "f08da13f85c6db6de4a0b675e1dd5726837c0a32"
+          }
+        },
+        {
+          "client_id": "464570700462-2leg9qm8ugkga6vlav8e4s8hj1atmgd7.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDHOn-Eul80LsfGfZGVtr0HHNhHiWu8YE0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "464570700462-2leg9qm8ugkga6vlav8e4s8hj1atmgd7.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "464570700462-r13piha6dst5fqv5huretksk408i7ulb.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.gezi"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:464570700462:android:4fbe41d9e649aa1209933f",
+        "android_client_info": {
+          "package_name": "com.high_performance"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "464570700462-2leg9qm8ugkga6vlav8e4s8hj1atmgd7.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDHOn-Eul80LsfGfZGVtr0HHNhHiWu8YE0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "464570700462-2leg9qm8ugkga6vlav8e4s8hj1atmgd7.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "464570700462-r13piha6dst5fqv5huretksk408i7ulb.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.gezi"
+              }
+            }
+          ]
+        }
+      },
+      "admob_app_id": "ca-app-pub-4019884341575548~6687000220"
+    }
+  ],
+  "configuration_version": "1"
+}

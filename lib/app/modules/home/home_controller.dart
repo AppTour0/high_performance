@@ -37,11 +37,11 @@ abstract class _HomeBase with Store {
   ];
 
   @observable
-  ObservableStream<List<TasksListWithTask>> tasksList;
+  ObservableStream<List<Task>> tasks;
 
   @action
   getList() {
-    tasksList = _repository.getTasksList().asObservable();
+    tasks = _repository.getTasksList().asObservable();
   }
 
   /* 
@@ -58,18 +58,4 @@ abstract class _HomeBase with Store {
     tasksList2.addAll(data);
   } */
 
-  /* @action
-  save(TasksListModel model) async {
-    await _repository.create(model);
-  }
-
-  @action
-  delete(int id) async {
-    await _repository.deleteData(id);
-  }
-
-  @action
-  update(TasksListModel model) async {
-    await _repository.updateData(model);
-  } */
 }

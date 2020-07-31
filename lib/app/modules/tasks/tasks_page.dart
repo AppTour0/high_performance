@@ -1,3 +1,4 @@
+import 'package:admob_flutter/admob_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:flutter_modular/flutter_modular.dart';
@@ -7,8 +8,10 @@ import 'package:high_performance/app/components/inputs.dart';
 import 'package:high_performance/app/modules/tasks/tasks_controller.dart';
 import 'package:high_performance/app/modules/tasks/tasks_module.dart';
 import 'package:high_performance/app/shared/db/database.dart';
+import 'package:high_performance/app/shared/utils/admob/ad_manager.dart';
 import 'package:high_performance/app/shared/utils/utils.dart';
 import 'package:high_performance/app/shared/utils/validators.dart';
+import 'package:intl/intl.dart';
 
 class TasksPage extends StatefulWidget {
   final String title;
@@ -37,10 +40,22 @@ class _TasksPageState extends State<TasksPage> {
 
   final int helloAlarmID = 0;
 
+  AdManager _adManager = AdManager();
+  AdmobInterstitial interstitialAd;
+
   @override
   void initState() {
     super.initState();
     controller.getTask(widget.id);
+
+    interstitialAd = AdmobInterstitial(
+      adUnitId: _adManager.interstitialAdUnitId,
+      /* listener: (AdmobAdEvent event, Map<String, dynamic> args) {
+        if (event == AdmobAdEvent.closed) interstitialAd.load();
+        handleEvent(event, args, 'Interstitial');
+      }, */
+    );
+    interstitialAd.load();
   }
 
   @override
@@ -72,27 +87,30 @@ class _TasksPageState extends State<TasksPage> {
           ],
         ),
         body: Observer(builder: (context) {
-          if (controller.taskList.data == null ||
-              controller.tasks.data == null) {
+          if (controller.task.data == null) {
             return Center(child: CircularProgressIndicator());
           }
 
-          List<TasksListWithTask> dataList = controller.taskList.data;
-          List<Task> dataTask = controller.tasks.data;
+          List<Task> task = controller.task.data;
 
-          if (dataList.length > 0 && controller.idTaskList == 0) {
-            controller.idTaskList = dataList[0].taskList.id;
-            controller.idTaskEditing.text =
-                dataList[0].taskList.idTask.toString();
-            controller.taskEditing.text = dataList[0].task.name;
-            controller.alarm = dataList[0].taskList.alarm;
-            controller.daysOfWeek[1]['bool'] = dataList[0].taskList.mon;
-            controller.daysOfWeek[2]['bool'] = dataList[0].taskList.tue;
-            controller.daysOfWeek[3]['bool'] = dataList[0].taskList.wed;
-            controller.daysOfWeek[4]['bool'] = dataList[0].taskList.thu;
-            controller.daysOfWeek[5]['bool'] = dataList[0].taskList.fri;
-            controller.daysOfWeek[6]['bool'] = dataList[0].taskList.sat;
-            controller.daysOfWeek[0]['bool'] = dataList[0].taskList.sun;
+          if (task.length > 0 && controller.idTask == 0) {
+            String formatCoditional =
+                task[0].repeat ? "kk:mm" : "dd/mm/yyyy - kk:mm";
+            controller.idTask = task[0].id;
+            controller.taskEditing.text = task[0].name;
+            controller.alarm = task[0].alarm;
+            controller.daysOfWeek[1]['bool'] = task[0].mon;
+            controller.daysOfWeek[2]['bool'] = task[0].tue;
+            controller.daysOfWeek[3]['bool'] = task[0].wed;
+            controller.daysOfWeek[4]['bool'] = task[0].thu;
+            controller.daysOfWeek[5]['bool'] = task[0].fri;
+            controller.daysOfWeek[6]['bool'] = task[0].sat;
+            controller.daysOfWeek[0]['bool'] = task[0].sun;
+            controller.dateEditing.text = DateFormat(formatCoditional)
+                .format(task[0].dateTimeNotification);
+            controller.datetimeToDb = task[0].dateTimeNotification;
+            controller.messageEditing.text = task[0].message;
+            controller.repeat = task[0].repeat;
             /* controller.taskEditing.text = controller.tasks
                 .where((element) => element.id == data.idTask)
                 .last
@@ -107,12 +125,12 @@ class _TasksPageState extends State<TasksPage> {
             labelText = "Selecione uma data e hora";
           }
 
-          List<Map<String, dynamic>> list = [];
+          /* List<Map<String, dynamic>> list = [];
           if (dataTask.length > 0) {
             for (var item in dataTask) {
               list.add({"id": item.id, "title": item.name});
             }
-          }
+          } */
 
           return Form(
             key: _formKey,
@@ -122,7 +140,7 @@ class _TasksPageState extends State<TasksPage> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
-                    Row(
+                    /* Row(
                       children: <Widget>[
                         Flexible(
                           flex: 5,
@@ -132,7 +150,13 @@ class _TasksPageState extends State<TasksPage> {
                           child: addTask(list),
                         ),
                       ],
-                    ),
+                    ), */
+                    CustomInput(
+                        editingController: controller.taskEditing,
+                        inputType: TextInputType.text,
+                        hintText: "Nome do Hábito",
+                        labelText: "Nome do Hábito",
+                        validator: validators.validateNotEmptyForm),
                     SizedBox(
                       height: 20.0,
                     ),
@@ -176,7 +200,7 @@ class _TasksPageState extends State<TasksPage> {
                         hintText: hintText,
                         labelText: labelText,
                         icon:
-                            controller.repeat ? Icons.date_range : Icons.timer,
+                            controller.repeat ? Icons.timer : Icons.date_range,
                         readOnly: true,
                         suffixIcon: IconButton(
                           icon: Icon(
@@ -191,9 +215,37 @@ class _TasksPageState extends State<TasksPage> {
                             : validators.validateNotEmptyForm,
                         onTap: () {
                           controller.repeat
-                              ? _selectTime(context)
-                              : _selectDateTime(context)
-                                  .then((value) => _selectTime(context));
+                              ? _selectTime(context).then((value) => {
+                                    controller.datetimeToDb = DateTime(
+                                        now.year,
+                                        now.month,
+                                        now.day,
+                                        value.hour,
+                                        value.minute),
+                                    controller.dateEditing.text =
+                                        DateFormat("kk:mm")
+                                            .format(controller.datetimeToDb)
+                                  })
+                              : _selectDateTime(context).then((value) => {
+                                    controller.datetimeToDb = DateTime(
+                                        value.year,
+                                        value.month,
+                                        value.day,
+                                        now.hour,
+                                        now.minute),
+                                    _selectTime(context).then((value) => {
+                                          controller.datetimeToDb = DateTime(
+                                              controller.datetimeToDb.year,
+                                              controller.datetimeToDb.month,
+                                              controller.datetimeToDb.day,
+                                              value.hour,
+                                              value.minute),
+                                          controller.dateEditing.text =
+                                              DateFormat("dd/mm/yyyy - kk:mm")
+                                                  .format(
+                                                      controller.datetimeToDb),
+                                        })
+                                  });
                         }),
                     SizedBox(
                       height: 20.0,
@@ -224,7 +276,7 @@ class _TasksPageState extends State<TasksPage> {
     );
   }
 
-  Widget task(List<Map<String, dynamic>> list) {
+  Widget taskSelect(List<Map<String, dynamic>> list) {
     return Padding(
         padding: const EdgeInsets.fromLTRB(0, 5, 0, 0),
         child: TextFormField(
@@ -235,7 +287,7 @@ class _TasksPageState extends State<TasksPage> {
               chooseModal.choose(
                   context: context,
                   list: list,
-                  idEditing: controller.idTaskEditing,
+                  //idEditing: controller.idTaskEditing,
                   textEditing: controller.taskEditing);
             },
             validator: (value) {
@@ -257,7 +309,7 @@ class _TasksPageState extends State<TasksPage> {
                 ))));
   }
 
-  Widget addTask(List<Map<String, dynamic>> list) {
+  /* Widget addTask(List<Map<String, dynamic>> list) {
     return IconButton(
       onPressed: () {
         inputDialog.showInput(
@@ -270,13 +322,13 @@ class _TasksPageState extends State<TasksPage> {
       color: Theme.of(context).accentColor,
       iconSize: 40,
     );
-  }
+  } */
 
-  tapAction() {
-    List<TasksListWithTask> dataList = controller.taskList.data;
-    controller.submitTask(dataList);
+  /* tapAction() {
+    List<Task> dataList = controller.task.data;
+    //controller.submitTask(dataList);
     controller.getTasks();
-  }
+  } */
 
   Widget datePicker() {
     return RaisedButton(
@@ -451,17 +503,17 @@ class _TasksPageState extends State<TasksPage> {
   /* =========================== Functions ================================ */
 
   Future<void> save() async {
-    List<TasksListWithTask> dataList = controller.taskList.data;
+    List<Task> dataList = controller.task.data;
     final form = _formKey.currentState;
     if (form.validate()) {
       form.save();
-      await controller
-          .submitList(dataList,
-              onError: (title, description) async {}, onSuccess: () async {})
-          .then(
-            //alarmTest();
-            (value) => Modular.to.pop(),
-          );
+      await controller.submitTask(dataList, onError: (title, description) {
+        utils.flushBarDanger(
+            context: context, title: title, description: description);
+      }, onSuccess: () {
+        Modular.to.pop();
+        interstitialAd.show();
+      });
     }
   }
 
@@ -483,6 +535,7 @@ class _TasksPageState extends State<TasksPage> {
                     onSuccess: () {
                       Modular.to.pop();
                       utils.flushBarSuccess(
+                          positionBottom: true,
                           context: context,
                           title: "Sucesso!",
                           description: "Tarefa deletada com sucesso.");

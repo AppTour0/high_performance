@@ -233,6 +233,7 @@ class Utils {
     @required String title,
     @required String description,
     Duration duration,
+    bool positionBottom = false,
   }) {
     if (description.toLowerCase().contains("terminated") ||
         description.toLowerCase().contains("closed")) {
@@ -242,7 +243,8 @@ class Utils {
       title: title,
       message: description,
       duration: duration == null ? Duration(seconds: 8) : duration,
-      flushbarPosition: FlushbarPosition.TOP,
+      flushbarPosition:
+          !positionBottom ? FlushbarPosition.TOP : FlushbarPosition.BOTTOM,
       leftBarIndicatorColor: Colors.red,
       isDismissible: false,
       shouldIconPulse: false,
@@ -287,12 +289,14 @@ class Utils {
     @required String title,
     @required String description,
     Duration duration,
+    bool positionBottom = false,
   }) {
     return Flushbar(
       title: title,
       message: description,
       duration: duration == null ? Duration(seconds: 8) : duration,
-      flushbarPosition: FlushbarPosition.TOP,
+      flushbarPosition:
+          !positionBottom ? FlushbarPosition.TOP : FlushbarPosition.BOTTOM,
       leftBarIndicatorColor: Colors.orange,
       isDismissible: false,
       shouldIconPulse: false,

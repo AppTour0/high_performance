@@ -7,16 +7,6 @@ part 'database.g.dart';
 class Tasks extends Table {
   IntColumn get id => integer().autoIncrement()();
   TextColumn get name => text()();
-  DateTimeColumn get dateCreate => dateTime()();
-  DateTimeColumn get dateModify => dateTime()();
-
-  @override
-  Set<Column> get primaryKey => {id};
-}
-
-class TasksList extends Table {
-  IntColumn get id => integer().autoIncrement()();
-  IntColumn get idTask => integer().customConstraint('REFERENCES tasks(id)')();
   BoolColumn get alarm => boolean().withDefault(const Constant(false))();
   BoolColumn get mon => boolean().withDefault(const Constant(false))();
   BoolColumn get tue => boolean().withDefault(const Constant(false))();
@@ -25,6 +15,9 @@ class TasksList extends Table {
   BoolColumn get fri => boolean().withDefault(const Constant(false))();
   BoolColumn get sat => boolean().withDefault(const Constant(false))();
   BoolColumn get sun => boolean().withDefault(const Constant(false))();
+  BoolColumn get repeat => boolean().withDefault(const Constant(false))();
+  BoolColumn get unique => boolean().withDefault(const Constant(false))();
+  TextColumn get message => text()();
   DateTimeColumn get dateTimeNotification => dateTime()();
   DateTimeColumn get dateCreate => dateTime()();
   DateTimeColumn get dateModify => dateTime()();
@@ -33,7 +26,19 @@ class TasksList extends Table {
   Set<Column> get primaryKey => {id};
 }
 
-class TasksListWithTask {
+class TasksDetail extends Table {
+  IntColumn get id => integer().autoIncrement()();
+  IntColumn get idTask => integer().customConstraint('REFERENCES Tasks(id)')();
+  BoolColumn get confirm => boolean().withDefault(const Constant(false))();
+  DateTimeColumn get dateConfirm => dateTime()();
+  DateTimeColumn get dateCreate => dateTime()();
+  DateTimeColumn get dateModify => dateTime()();
+
+  @override
+  Set<Column> get primaryKey => {id};
+}
+
+/* class TasksListWithTask {
   final TasksListData taskList;
   final Task task;
 
@@ -41,10 +46,10 @@ class TasksListWithTask {
     @required this.taskList,
     @required this.task,
   });
-}
+} */
 
 @UseMoor(
-    tables: [Tasks, TasksList], daos: [TasksRepository, TasksListRepository])
+    tables: [Tasks, TasksDetail], daos: [TasksRepository, TasksListRepository])
 class Database extends _$Database {
   static Database instance = Database._internal();
 
@@ -58,26 +63,26 @@ class Database extends _$Database {
     tasksListRepository = TasksListRepository(this);
   }
 
-  List<Task> tasksInit = [
-    Task(
+  /* List<Tasks> tasksInit = [
+    Tasks(
       id: null,
       name: "Acordar cedo",
       dateCreate: DateTime.now(),
       dateModify: DateTime.now(),
     ),
-    Task(
+    Tasks(
       id: null,
       name: "Ler um Livro",
       dateCreate: DateTime.now(),
       dateModify: DateTime.now(),
     ),
-    Task(
+    Tasks(
       id: null,
       name: "Meditar",
       dateCreate: DateTime.now(),
       dateModify: DateTime.now(),
     ),
-  ];
+  ]; */
 
   @override
   int get schemaVersion => 1;
@@ -88,9 +93,9 @@ class Database extends _$Database {
         beforeOpen: (details) async {
           await customStatement('PRAGMA foreign_keys = ON');
           if (details.wasCreated) {
-            tasksInit.forEach((element) async {
+            /* tasksInit.forEach((element) async {
               await tasksRepository.insertData(element);
-            });
+            }); */
           }
         },
       );

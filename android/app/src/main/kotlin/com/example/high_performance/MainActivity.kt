@@ -1,4 +1,4 @@
-package com.example.high_performance
+package com.high_performance
 
 import io.flutter.embedding.android.FlutterActivity
 

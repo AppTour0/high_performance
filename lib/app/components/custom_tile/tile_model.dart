@@ -1,7 +1,9 @@
+import 'package:flutter/cupertino.dart';
+
 class TileModel {
   int id;
-  String title;
-  String subtitle;
+  Widget title;
+  List<Widget> subtitle;
   dynamic trailing;
 
   TileModel({this.id, this.title, this.subtitle});

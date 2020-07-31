@@ -24,18 +24,18 @@ mixin _$HomeController on _HomeBase, Store {
     });
   }
 
-  final _$tasksListAtom = Atom(name: '_HomeBase.tasksList');
+  final _$tasksAtom = Atom(name: '_HomeBase.tasks');
 
   @override
-  ObservableStream<List<TasksListWithTask>> get tasksList {
-    _$tasksListAtom.reportRead();
-    return super.tasksList;
+  ObservableStream<List<Task>> get tasks {
+    _$tasksAtom.reportRead();
+    return super.tasks;
   }
 
   @override
-  set tasksList(ObservableStream<List<TasksListWithTask>> value) {
-    _$tasksListAtom.reportWrite(value, super.tasksList, () {
-      super.tasksList = value;
+  set tasks(ObservableStream<List<Task>> value) {
+    _$tasksAtom.reportWrite(value, super.tasks, () {
+      super.tasks = value;
     });
   }
 
@@ -56,7 +56,7 @@ mixin _$HomeController on _HomeBase, Store {
   String toString() {
     return '''
 daysOfWeek: ${daysOfWeek},
-tasksList: ${tasksList}
+tasks: ${tasks}
     ''';
   }
 }
