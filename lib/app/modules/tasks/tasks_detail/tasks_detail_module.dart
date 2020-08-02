@@ -10,7 +10,7 @@ class TasksDetailModule extends ChildModule {
 
   @override
   List<Router> get routers => [
-        Router('/', child: (_, args) => TasksDetailPage()),
+        Router('/:id', child: (_, args) => TasksDetailPage(id: args.data)),
       ];
 
   static Inject get to => Inject<TasksDetailModule>.of();

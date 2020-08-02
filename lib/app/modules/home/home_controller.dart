@@ -21,7 +21,7 @@ abstract class _HomeBase with Store {
   }
 
   _HomeBase() {
-    getList();
+    getLists();
     initializeNotifications();
   }
 
@@ -38,11 +38,16 @@ abstract class _HomeBase with Store {
 
   @observable
   ObservableStream<List<Task>> tasks;
+  ObservableStream<List<Task>> habits;
 
   @action
-  getList() {
-    tasks = _repository.getTasksList().asObservable();
+  getLists() {
+    tasks = _repository.getTasksList(false).asObservable();
+    habits = _repository.getTasksList(true).asObservable();
   }
+
+  @observable
+  int bottomIndex = 0;
 
   /* 
   @action

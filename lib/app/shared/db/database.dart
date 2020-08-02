@@ -16,7 +16,6 @@ class Tasks extends Table {
   BoolColumn get sat => boolean().withDefault(const Constant(false))();
   BoolColumn get sun => boolean().withDefault(const Constant(false))();
   BoolColumn get repeat => boolean().withDefault(const Constant(false))();
-  BoolColumn get unique => boolean().withDefault(const Constant(false))();
   TextColumn get message => text()();
   DateTimeColumn get dateTimeNotification => dateTime()();
   DateTimeColumn get dateCreate => dateTime()();

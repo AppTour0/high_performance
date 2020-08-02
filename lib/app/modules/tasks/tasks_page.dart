@@ -75,15 +75,6 @@ class _TasksPageState extends State<TasksPage> {
                 },
               ),
             ),
-            Visibility(
-              visible: widget.id > 0,
-              child: IconButton(
-                icon: Icon(Icons.delete),
-                onPressed: () {
-                  delete();
-                },
-              ),
-            )
           ],
         ),
         body: Observer(builder: (context) {
@@ -515,34 +506,6 @@ class _TasksPageState extends State<TasksPage> {
         interstitialAd.show();
       });
     }
-  }
-
-  delete() async {
-    String title = "Atenção!!!";
-    String value = "Deseja realente excluir esta tarefa?";
-    utils
-        .asyncConfirmDialog(
-            context: context, title: title, value: value, color: Colors.red)
-        .then((value) => {
-              if (value.index == 1)
-                {
-                  controller.delete(
-                    widget.id,
-                    onError: (title, description) => utils.flushBarDanger(
-                        context: context,
-                        title: title,
-                        description: description),
-                    onSuccess: () {
-                      Modular.to.pop();
-                      utils.flushBarSuccess(
-                          positionBottom: true,
-                          context: context,
-                          title: "Sucesso!",
-                          description: "Tarefa deletada com sucesso.");
-                    },
-                  )
-                }
-            });
   }
 
   Future<TimeOfDay> _selectTime(BuildContext context) {

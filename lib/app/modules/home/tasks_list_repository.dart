@@ -12,8 +12,12 @@ class TasksListRepository extends DatabaseAccessor<Database>
 
   TasksListRepository(this.db) : super(db);
 
-  Stream<List<Task>> getTasksList() {
+  Stream<List<Task>> getAllTasksList() {
     return (select(tasks)).watch();
+  }
+
+  Stream<List<Task>> getTasksList(bool repeat) {
+    return (select(tasks)..where((u) => u.repeat.equals(repeat))).watch();
   }
 
   Stream<List<Task>> getTaskById(int id) {

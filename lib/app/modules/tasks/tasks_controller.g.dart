@@ -102,16 +102,6 @@ mixin _$TasksController on _TasksBase, Store {
         () => super.submitTask(data, onError: onError, onSuccess: onSuccess));
   }
 
-  final _$deleteAsyncAction = AsyncAction('_TasksBase.delete');
-
-  @override
-  Future<dynamic> delete(int id,
-      {Future<VoidCallback> Function(String, String) onError,
-      Future<VoidCallback> Function() onSuccess}) {
-    return _$deleteAsyncAction
-        .run(() => super.delete(id, onError: onError, onSuccess: onSuccess));
-  }
-
   final _$_TasksBaseActionController = ActionController(name: '_TasksBase');
 
   @override

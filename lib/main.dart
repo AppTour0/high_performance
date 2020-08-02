@@ -50,5 +50,5 @@ Future<void> main() async {
     testDevices: <String>[], // Android emulators are considered test devices
   ); */
 
-  runApp(ModularApp(module: AppModule()));
+  runApp(ModularApp(isCupertino: true, module: AppModule()));
 }

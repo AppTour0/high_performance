@@ -13,7 +13,6 @@ part 'tasks_controller.g.dart';
 class TasksController = _TasksBase with _$TasksController;
 
 abstract class _TasksBase with Store {
-  final _repository = Database.instance.tasksRepository;
   final _listRepository = Database.instance.tasksListRepository;
   VariablesNotification vars = VariablesNotification();
   String title = "Atenção!!!";
@@ -152,7 +151,6 @@ abstract class _TasksBase with Store {
         dateTimeNotification: datetimeToDb,
         message: messageEditing.text,
         repeat: repeat,
-        unique: false,
         dateModify: DateTime.now(),
         dateCreate: DateTime.now(),
       );
@@ -195,23 +193,6 @@ abstract class _TasksBase with Store {
     } else {
       singleNotification(
           datetimeToDb, taskEditing.text, messageEditing.text, value);
-    }
-  }
-
-  @action
-  Future delete(int id,
-      {Future<VoidCallback> onError(String title, String description),
-      Future<VoidCallback> onSuccess()}) async {
-    try {
-      await _listRepository
-          .deleteData(id)
-          .then((value) =>
-              {vars.flutterLocalNotificationsPlugin.cancel(id), onSuccess()})
-          .catchError((error) => {
-                onError(title, error),
-              });
-    } catch (e) {
-      onError(title, e.message);
     }
   }
 }

@@ -39,14 +39,29 @@ mixin _$HomeController on _HomeBase, Store {
     });
   }
 
+  final _$bottomIndexAtom = Atom(name: '_HomeBase.bottomIndex');
+
+  @override
+  int get bottomIndex {
+    _$bottomIndexAtom.reportRead();
+    return super.bottomIndex;
+  }
+
+  @override
+  set bottomIndex(int value) {
+    _$bottomIndexAtom.reportWrite(value, super.bottomIndex, () {
+      super.bottomIndex = value;
+    });
+  }
+
   final _$_HomeBaseActionController = ActionController(name: '_HomeBase');
 
   @override
-  dynamic getList() {
+  dynamic getLists() {
     final _$actionInfo =
-        _$_HomeBaseActionController.startAction(name: '_HomeBase.getList');
+        _$_HomeBaseActionController.startAction(name: '_HomeBase.getLists');
     try {
-      return super.getList();
+      return super.getLists();
     } finally {
       _$_HomeBaseActionController.endAction(_$actionInfo);
     }
@@ -56,7 +71,8 @@ mixin _$HomeController on _HomeBase, Store {
   String toString() {
     return '''
 daysOfWeek: ${daysOfWeek},
-tasks: ${tasks}
+tasks: ${tasks},
+bottomIndex: ${bottomIndex}
     ''';
   }
 }

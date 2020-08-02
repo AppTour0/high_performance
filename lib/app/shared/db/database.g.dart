@@ -19,7 +19,6 @@ class Task extends DataClass implements Insertable<Task> {
   final bool sat;
   final bool sun;
   final bool repeat;
-  final bool unique;
   final String message;
   final DateTime dateTimeNotification;
   final DateTime dateCreate;
@@ -36,7 +35,6 @@ class Task extends DataClass implements Insertable<Task> {
       @required this.sat,
       @required this.sun,
       @required this.repeat,
-      @required this.unique,
       @required this.message,
       @required this.dateTimeNotification,
       @required this.dateCreate,
@@ -61,8 +59,6 @@ class Task extends DataClass implements Insertable<Task> {
       sun: boolType.mapFromDatabaseResponse(data['${effectivePrefix}sun']),
       repeat:
           boolType.mapFromDatabaseResponse(data['${effectivePrefix}repeat']),
-      unique:
-          boolType.mapFromDatabaseResponse(data['${effectivePrefix}unique']),
       message:
           stringType.mapFromDatabaseResponse(data['${effectivePrefix}message']),
       dateTimeNotification: dateTimeType.mapFromDatabaseResponse(
@@ -109,9 +105,6 @@ class Task extends DataClass implements Insertable<Task> {
     if (!nullToAbsent || repeat != null) {
       map['repeat'] = Variable<bool>(repeat);
     }
-    if (!nullToAbsent || unique != null) {
-      map['unique'] = Variable<bool>(unique);
-    }
     if (!nullToAbsent || message != null) {
       map['message'] = Variable<String>(message);
     }
@@ -142,8 +135,6 @@ class Task extends DataClass implements Insertable<Task> {
       sun: sun == null && nullToAbsent ? const Value.absent() : Value(sun),
       repeat:
           repeat == null && nullToAbsent ? const Value.absent() : Value(repeat),
-      unique:
-          unique == null && nullToAbsent ? const Value.absent() : Value(unique),
       message: message == null && nullToAbsent
           ? const Value.absent()
           : Value(message),
@@ -174,7 +165,6 @@ class Task extends DataClass implements Insertable<Task> {
       sat: serializer.fromJson<bool>(json['sat']),
       sun: serializer.fromJson<bool>(json['sun']),
       repeat: serializer.fromJson<bool>(json['repeat']),
-      unique: serializer.fromJson<bool>(json['unique']),
       message: serializer.fromJson<String>(json['message']),
       dateTimeNotification:
           serializer.fromJson<DateTime>(json['dateTimeNotification']),
@@ -197,7 +187,6 @@ class Task extends DataClass implements Insertable<Task> {
       'sat': serializer.toJson<bool>(sat),
       'sun': serializer.toJson<bool>(sun),
       'repeat': serializer.toJson<bool>(repeat),
-      'unique': serializer.toJson<bool>(unique),
       'message': serializer.toJson<String>(message),
       'dateTimeNotification': serializer.toJson<DateTime>(dateTimeNotification),
       'dateCreate': serializer.toJson<DateTime>(dateCreate),
@@ -217,7 +206,6 @@ class Task extends DataClass implements Insertable<Task> {
           bool sat,
           bool sun,
           bool repeat,
-          bool unique,
           String message,
           DateTime dateTimeNotification,
           DateTime dateCreate,
@@ -234,7 +222,6 @@ class Task extends DataClass implements Insertable<Task> {
         sat: sat ?? this.sat,
         sun: sun ?? this.sun,
         repeat: repeat ?? this.repeat,
-        unique: unique ?? this.unique,
         message: message ?? this.message,
         dateTimeNotification: dateTimeNotification ?? this.dateTimeNotification,
         dateCreate: dateCreate ?? this.dateCreate,
@@ -254,7 +241,6 @@ class Task extends DataClass implements Insertable<Task> {
           ..write('sat: $sat, ')
           ..write('sun: $sun, ')
           ..write('repeat: $repeat, ')
-          ..write('unique: $unique, ')
           ..write('message: $message, ')
           ..write('dateTimeNotification: $dateTimeNotification, ')
           ..write('dateCreate: $dateCreate, ')
@@ -287,17 +273,14 @@ class Task extends DataClass implements Insertable<Task> {
                                           $mrjc(
                                               repeat.hashCode,
                                               $mrjc(
-                                                  unique.hashCode,
+                                                  message.hashCode,
                                                   $mrjc(
-                                                      message.hashCode,
+                                                      dateTimeNotification
+                                                          .hashCode,
                                                       $mrjc(
-                                                          dateTimeNotification
-                                                              .hashCode,
-                                                          $mrjc(
-                                                              dateCreate
-                                                                  .hashCode,
-                                                              dateModify
-                                                                  .hashCode))))))))))))))));
+                                                          dateCreate.hashCode,
+                                                          dateModify
+                                                              .hashCode)))))))))))))));
   @override
   bool operator ==(dynamic other) =>
       identical(this, other) ||
@@ -313,7 +296,6 @@ class Task extends DataClass implements Insertable<Task> {
           other.sat == this.sat &&
           other.sun == this.sun &&
           other.repeat == this.repeat &&
-          other.unique == this.unique &&
           other.message == this.message &&
           other.dateTimeNotification == this.dateTimeNotification &&
           other.dateCreate == this.dateCreate &&
@@ -332,7 +314,6 @@ class TasksCompanion extends UpdateCompanion<Task> {
   final Value<bool> sat;
   final Value<bool> sun;
   final Value<bool> repeat;
-  final Value<bool> unique;
   final Value<String> message;
   final Value<DateTime> dateTimeNotification;
   final Value<DateTime> dateCreate;
@@ -349,7 +330,6 @@ class TasksCompanion extends UpdateCompanion<Task> {
     this.sat = const Value.absent(),
     this.sun = const Value.absent(),
     this.repeat = const Value.absent(),
-    this.unique = const Value.absent(),
     this.message = const Value.absent(),
     this.dateTimeNotification = const Value.absent(),
     this.dateCreate = const Value.absent(),
@@ -367,7 +347,6 @@ class TasksCompanion extends UpdateCompanion<Task> {
     this.sat = const Value.absent(),
     this.sun = const Value.absent(),
     this.repeat = const Value.absent(),
-    this.unique = const Value.absent(),
     @required String message,
     @required DateTime dateTimeNotification,
     @required DateTime dateCreate,
@@ -389,7 +368,6 @@ class TasksCompanion extends UpdateCompanion<Task> {
     Expression<bool> sat,
     Expression<bool> sun,
     Expression<bool> repeat,
-    Expression<bool> unique,
     Expression<String> message,
     Expression<DateTime> dateTimeNotification,
     Expression<DateTime> dateCreate,
@@ -407,7 +385,6 @@ class TasksCompanion extends UpdateCompanion<Task> {
       if (sat != null) 'sat': sat,
       if (sun != null) 'sun': sun,
       if (repeat != null) 'repeat': repeat,
-      if (unique != null) 'unique': unique,
       if (message != null) 'message': message,
       if (dateTimeNotification != null)
         'date_time_notification': dateTimeNotification,
@@ -428,7 +405,6 @@ class TasksCompanion extends UpdateCompanion<Task> {
       Value<bool> sat,
       Value<bool> sun,
       Value<bool> repeat,
-      Value<bool> unique,
       Value<String> message,
       Value<DateTime> dateTimeNotification,
       Value<DateTime> dateCreate,
@@ -445,7 +421,6 @@ class TasksCompanion extends UpdateCompanion<Task> {
       sat: sat ?? this.sat,
       sun: sun ?? this.sun,
       repeat: repeat ?? this.repeat,
-      unique: unique ?? this.unique,
       message: message ?? this.message,
       dateTimeNotification: dateTimeNotification ?? this.dateTimeNotification,
       dateCreate: dateCreate ?? this.dateCreate,
@@ -489,9 +464,6 @@ class TasksCompanion extends UpdateCompanion<Task> {
     if (repeat.present) {
       map['repeat'] = Variable<bool>(repeat.value);
     }
-    if (unique.present) {
-      map['unique'] = Variable<bool>(unique.value);
-    }
     if (message.present) {
       map['message'] = Variable<String>(message.value);
     }
@@ -522,7 +494,6 @@ class TasksCompanion extends UpdateCompanion<Task> {
           ..write('sat: $sat, ')
           ..write('sun: $sun, ')
           ..write('repeat: $repeat, ')
-          ..write('unique: $unique, ')
           ..write('message: $message, ')
           ..write('dateTimeNotification: $dateTimeNotification, ')
           ..write('dateCreate: $dateCreate, ')
@@ -638,15 +609,6 @@ class $TasksTable extends Tasks with TableInfo<$TasksTable, Task> {
         defaultValue: const Constant(false));
   }
 
-  final VerificationMeta _uniqueMeta = const VerificationMeta('unique');
-  GeneratedBoolColumn _unique;
-  @override
-  GeneratedBoolColumn get unique => _unique ??= _constructUnique();
-  GeneratedBoolColumn _constructUnique() {
-    return GeneratedBoolColumn('unique', $tableName, false,
-        defaultValue: const Constant(false));
-  }
-
   final VerificationMeta _messageMeta = const VerificationMeta('message');
   GeneratedTextColumn _message;
   @override
@@ -712,7 +674,6 @@ class $TasksTable extends Tasks with TableInfo<$TasksTable, Task> {
         sat,
         sun,
         repeat,
-        unique,
         message,
         dateTimeNotification,
         dateCreate,
@@ -773,10 +734,6 @@ class $TasksTable extends Tasks with TableInfo<$TasksTable, Task> {
     if (data.containsKey('repeat')) {
       context.handle(_repeatMeta,
           repeat.isAcceptableOrUnknown(data['repeat'], _repeatMeta));
-    }
-    if (data.containsKey('unique')) {
-      context.handle(_uniqueMeta,
-          unique.isAcceptableOrUnknown(data['unique'], _uniqueMeta));
     }
     if (data.containsKey('message')) {
       context.handle(_messageMeta,

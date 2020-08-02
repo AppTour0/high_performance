@@ -9,30 +9,40 @@ part of 'tasks_detail_controller.dart';
 // ignore_for_file: non_constant_identifier_names, unnecessary_brace_in_string_interps, unnecessary_lambdas, prefer_expression_function_bodies, lines_longer_than_80_chars, avoid_as, avoid_annotating_with_dynamic
 
 mixin _$TasksDetailController on _TasksDetailBase, Store {
-  final _$valueAtom = Atom(name: '_TasksDetailBase.value');
+  final _$taskAtom = Atom(name: '_TasksDetailBase.task');
 
   @override
-  int get value {
-    _$valueAtom.reportRead();
-    return super.value;
+  ObservableStream<List<Task>> get task {
+    _$taskAtom.reportRead();
+    return super.task;
   }
 
   @override
-  set value(int value) {
-    _$valueAtom.reportWrite(value, super.value, () {
-      super.value = value;
+  set task(ObservableStream<List<Task>> value) {
+    _$taskAtom.reportWrite(value, super.task, () {
+      super.task = value;
     });
+  }
+
+  final _$deleteAsyncAction = AsyncAction('_TasksDetailBase.delete');
+
+  @override
+  Future<dynamic> delete(int id,
+      {Future<VoidCallback> Function(String, String) onError,
+      Future<VoidCallback> Function() onSuccess}) {
+    return _$deleteAsyncAction
+        .run(() => super.delete(id, onError: onError, onSuccess: onSuccess));
   }
 
   final _$_TasksDetailBaseActionController =
       ActionController(name: '_TasksDetailBase');
 
   @override
-  void increment() {
+  dynamic getTask(int id) {
     final _$actionInfo = _$_TasksDetailBaseActionController.startAction(
-        name: '_TasksDetailBase.increment');
+        name: '_TasksDetailBase.getTask');
     try {
-      return super.increment();
+      return super.getTask(id);
     } finally {
       _$_TasksDetailBaseActionController.endAction(_$actionInfo);
     }
@@ -41,7 +51,7 @@ mixin _$TasksDetailController on _TasksDetailBase, Store {
   @override
   String toString() {
     return '''
-value: ${value}
+task: ${task}
     ''';
   }
 }
