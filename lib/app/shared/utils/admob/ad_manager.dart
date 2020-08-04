@@ -7,7 +7,7 @@ class AdManager {
 
   String get appId {
     if (Platform.isAndroid) {
-      return constants.ADMOB_TEST;
+      return constants.ADMOB;
     } else if (Platform.isIOS) {
       return constants.ADMOB;
     } else {
@@ -17,7 +17,7 @@ class AdManager {
 
   String get bannerAdUnitId {
     if (Platform.isAndroid) {
-      return constants.BANNER_TEST;
+      return constants.BANNER;
     } else if (Platform.isIOS) {
       return "<YOUR_IOS_BANNER_AD_UNIT_ID>";
     } else {
@@ -27,7 +27,7 @@ class AdManager {
 
   String get interstitialAdUnitId {
     if (Platform.isAndroid) {
-      return constants.FULL_SCREEN_TEST;
+      return constants.FULL_SCREEN;
     } else if (Platform.isIOS) {
       return "<YOUR_IOS_INTERSTITIAL_AD_UNIT_ID>";
     } else {

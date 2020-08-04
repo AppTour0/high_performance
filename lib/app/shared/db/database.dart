@@ -1,4 +1,5 @@
 import 'package:high_performance/app/modules/home/tasks_list_repository.dart';
+import 'package:high_performance/app/modules/tasks/tasks_detail/tasks_detail_repository.dart';
 import 'package:high_performance/app/modules/tasks/tasks_repository.dart';
 import 'package:moor_flutter/moor_flutter.dart';
 
@@ -48,7 +49,8 @@ class TasksDetail extends Table {
 } */
 
 @UseMoor(
-    tables: [Tasks, TasksDetail], daos: [TasksRepository, TasksListRepository])
+    tables: [Tasks, TasksDetail],
+    daos: [TasksRepository, TasksListRepository, TasksDetailRepository])
 class Database extends _$Database {
   static Database instance = Database._internal();
 

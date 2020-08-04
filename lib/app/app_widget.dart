@@ -9,7 +9,7 @@ class AppWidget extends StatelessWidget {
       title: 'Alta Performance',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        scaffoldBackgroundColor: Colors.white,
+        //scaffoldBackgroundColor: Colors.white,
         accentColor: Color(0xFF333333),
         primaryColor: Color(0xFF333333),
         textTheme: GoogleFonts.nunitoTextTheme(

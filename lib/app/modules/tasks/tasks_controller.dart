@@ -43,9 +43,7 @@ abstract class _TasksBase with Store {
 
   TextEditingController taskEditing = TextEditingController();
   TextEditingController nameTaskEditing = TextEditingController();
-  DateFormat timeFomrat;
   TextEditingController timeEditing = TextEditingController();
-  DateFormat dateFomrat;
   TextEditingController dateEditing = TextEditingController();
   TextEditingController messageEditing = TextEditingController(text: "");
   int idTask = 0;
@@ -113,6 +111,24 @@ abstract class _TasksBase with Store {
     await vars.flutterLocalNotificationsPlugin.showDailyAtTime(
         hashcode, message, subtext, time, platformChannel,
         payload: hashcode.toString());
+  }
+
+  @action
+  Future<void> _showInsistentNotification() async {
+    // This value is from: https://developer.android.com/reference/android/app/Notification.html#FLAG_INSISTENT
+    var insistentFlag = 4;
+    var androidPlatformChannelSpecifics = AndroidNotificationDetails(
+        'your channel id', 'your channel name', 'your channel description',
+        importance: Importance.Max,
+        priority: Priority.High,
+        ticker: 'ticker',
+        additionalFlags: Int32List.fromList([insistentFlag]));
+    var iOSPlatformChannelSpecifics = IOSNotificationDetails();
+    var platformChannelSpecifics = NotificationDetails(
+        androidPlatformChannelSpecifics, iOSPlatformChannelSpecifics);
+    await vars.flutterLocalNotificationsPlugin.show(
+        0, 'insistent title', 'insistent body', platformChannelSpecifics,
+        payload: 'item x');
   }
 
   /* @action

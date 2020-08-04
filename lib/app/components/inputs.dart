@@ -15,6 +15,7 @@ class CustomInput extends StatelessWidget {
   final bool readOnly;
   final Function onTap;
   final Widget suffixIcon;
+  final textCapitalization;
 
   const CustomInput({
     Key key,
@@ -29,6 +30,7 @@ class CustomInput extends StatelessWidget {
     this.readOnly = false,
     this.onTap,
     this.suffixIcon,
+    this.textCapitalization = TextCapitalization.none,
   }) : super(key: key);
 
   @override
@@ -41,6 +43,7 @@ class CustomInput extends StatelessWidget {
           onChanged: change,
           maxLines: maxLines,
           readOnly: readOnly,
+          textCapitalization: textCapitalization,
           decoration: InputDecoration(
             hintText: hintText,
             labelText: labelText,

@@ -1,4 +1,5 @@
 import 'package:admob_flutter/admob_flutter.dart';
+import 'package:calendarro/calendarro.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_modular/flutter_modular.dart';
 import 'package:high_performance/app/components/custom_tile/custom_tile.dart';
@@ -6,9 +7,12 @@ import 'package:high_performance/app/components/custom_tile/tile_model.dart';
 import 'package:high_performance/app/modules/home/home_controller.dart';
 import 'package:high_performance/app/modules/home/home_module.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
+import 'package:high_performance/app/modules/tasks/alarm.dart';
+import 'package:high_performance/app/modules/tasks/tasks_arguments.dart';
 import 'package:high_performance/app/shared/db/database.dart';
 import 'package:high_performance/app/shared/utils/admob/ad_manager.dart';
 import 'package:high_performance/app/shared/utils/utils.dart';
+import 'package:high_performance/app/shared/utils/week_custom.dart';
 import 'package:intl/intl.dart';
 import 'dart:ui';
 import 'package:flutter/cupertino.dart';
@@ -27,6 +31,7 @@ class _HomePageState extends State<HomePage> {
   VariablesNotification vars = VariablesNotification();
   Utils utils = Utils();
   AdManager _adManager = AdManager();
+  DateTime now = DateTime.now();
 
   AdmobBannerSize bannerSize;
   AdmobBanner bannerAd;
@@ -52,28 +57,31 @@ class _HomePageState extends State<HomePage> {
     List<String> _title = ["Hábitos", "Tarefas"];
 
     return Scaffold(
-      appBar: PreferredSize(
-        preferredSize: Size.fromHeight(40),
-        child: AppBar(
-          /* title: controller.tasksList.length == null
-                ? Text(widget.title)
-                : Text(
-                    widget.title + " " + controller.tasksList.length.toString()), */
-          title: Text(
-            _title[controller.bottomIndex],
-            style: TextStyle(fontSize: 18),
-          ),
-          actions: <Widget>[
-            IconButton(
-                iconSize: 20,
-                icon: Icon(Icons.add),
-                onPressed: () async {
-                  await Modular.to
-                      .pushNamed("/tasks", arguments: 0)
-                      .then((value) => setStateCustom());
-                })
-          ],
+      appBar: AppBar(
+        /* title: controller.tasksList.length == null
+              ? Text(widget.title)
+              : Text(
+                  widget.title + " " + controller.tasksList.length.toString()), */
+        title: Text(
+          _title[controller.bottomIndex],
         ),
+        actions: <Widget>[
+          IconButton(
+              icon: Icon(Icons.add),
+              onPressed: () async {
+                await Modular.to
+                    .pushNamed("/tasks", arguments: 0)
+                    .then((value) => setStateCustom());
+              }),
+          /* IconButton(
+              icon: Icon(Icons.timer),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => Alarm()),
+                );
+              }) */
+        ],
       ),
       /* floatingActionButton: FloatingActionButton(
           onPressed: () {
@@ -120,79 +128,120 @@ class _HomePageState extends State<HomePage> {
   Widget habits() {
     return Observer(
       builder: (context) {
-        if (controller.habits.data == null) {
+        if (controller.habits.data == null ||
+            controller.habitsCompleted.data == null) {
           return Center(child: CircularProgressIndicator());
         }
 
         List<Task> data = controller.habits.data;
+        List<TasksDetailData> dataDetail = controller.habitsCompleted.data;
 
         if (data.length == 0) {
           return Center(child: Text("Não há hábitos"));
         }
 
+        List<DateTime> dateList = [];
+        List<TasksDetailData> dateListOfTask = [];
+
         return ListView.builder(
           itemCount: data.length,
           primary: true,
           itemBuilder: (context, index) {
+            dateList.clear();
+            dateListOfTask.clear();
+
+            dateListOfTask = dataDetail
+                .where((element) => element.idTask == data[index].id)
+                .toList();
+
+            dateList = List.generate(dateListOfTask.length, (index) {
+              return dateListOfTask[index].dateConfirm;
+            });
+
             return Padding(
               padding: const EdgeInsets.fromLTRB(5, 5, 5, 0),
               child: Container(
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(5),
-                  color: Colors.cyan[100],
+                  color: Colors.white,
+                  border: Border.all(
+                    color: Colors.black26,
+                    width: 1,
+                  ),
                 ),
-                child: ListTile(
-                  onTap: () {
-                    Modular.to
-                        .pushNamed("/tasksDetail", arguments: data[index].id);
-                  },
-                  title: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: <Widget>[
-                      Text(data[index].name,
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 18,
-                          )),
-                      Row(
+                child: Column(
+                  children: <Widget>[
+                    ListTile(
+                      onTap: () async {
+                        await Modular.to
+                            .pushNamed("/tasksDetail",
+                                arguments: TasksArguments(
+                                    data[index].id, data[index].name))
+                            .then((value) {
+                          controller.getLists();
+                          setState(() {});
+                        });
+                      },
+                      title: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: <Widget>[
-                          Icon(
-                            Icons.timer,
-                            size: 16,
-                            color: Colors.black45,
-                          ),
-                          SizedBox(
-                            width: 6,
-                          ),
-                          Text(
-                              DateFormat("kk:mm")
-                                  .format(data[index].dateTimeNotification),
+                          Text(data[index].name,
                               style: TextStyle(
-                                color: Colors.black45,
-                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 18,
                               )),
+                          Row(
+                            children: <Widget>[
+                              Icon(
+                                Icons.notifications_active,
+                                size: 16,
+                                color: Colors.black45,
+                              ),
+                              SizedBox(
+                                width: 6,
+                              ),
+                              Icon(
+                                data[index].alarm
+                                    ? Icons.timer
+                                    : Icons.timer_off,
+                                size: 16,
+                                color: Colors.black45,
+                              ),
+                              SizedBox(
+                                width: 6,
+                              ),
+                              Text(
+                                  DateFormat("kk:mm")
+                                      .format(data[index].dateTimeNotification),
+                                  style: TextStyle(
+                                    color: Colors.black45,
+                                    fontSize: 16,
+                                  )),
+                            ],
+                          )
                         ],
-                      )
-                    ],
-                  ),
-                  subtitle: Padding(
-                    padding: const EdgeInsets.fromLTRB(5, 3, 5, 3),
-                    child: Column(
-                      children: <Widget>[
-                        Row(
-                          children: <Widget>[Text("dia")],
-                        ),
-                        Row(
-                          children: <Widget>[
-                            Icon(
-                              Icons.check,
-                              size: 16,
-                            )
-                          ],
-                        ),
-                      ],
+                      ),
                     ),
-                  ),
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(8, 0, 8, 5),
+                      child: Calendarro(
+                        selectionMode: SelectionMode.MULTI,
+                        weekdayLabelsRow: CustomWeekdayLabelsRow(),
+                        selectedDates: dateList,
+                        selectedSingleDate: now,
+                        onTap: (datetime) {
+                          List<TasksDetailData> dateFilter = dateListOfTask
+                              .where(
+                                  (element) => element.dateConfirm == datetime)
+                              .toList();
+                          dateFilter.length == 0
+                              ? controller.insertDetail(
+                                  datetime, data[index].id)
+                              : controller.deleteDetail(dateFilter[0].id);
+                        },
+                      ),
+                    ),
+                  ],
                 ),
               ),
             );
@@ -224,9 +273,20 @@ class _HomePageState extends State<HomePage> {
               child: Container(
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(5),
-                  color: Colors.cyan[100],
+                  color: Colors.white,
+                  border: Border.all(
+                    color: Colors.black26,
+                    width: 1,
+                  ),
                 ),
                 child: ListTile(
+                  onTap: () async {
+                    await Modular.to
+                        .pushNamed('/tasks', arguments: data[index].id)
+                        .then((value) {
+                      setState(() {});
+                    });
+                  },
                   title: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: <Widget>[
@@ -238,7 +298,15 @@ class _HomePageState extends State<HomePage> {
                       Row(
                         children: <Widget>[
                           Icon(
-                            Icons.timer,
+                            Icons.notifications_active,
+                            size: 16,
+                            color: Colors.black45,
+                          ),
+                          SizedBox(
+                            width: 6,
+                          ),
+                          Icon(
+                            data[index].alarm ? Icons.timer : Icons.timer_off,
                             size: 16,
                             color: Colors.black45,
                           ),
@@ -257,23 +325,8 @@ class _HomePageState extends State<HomePage> {
                     ],
                   ),
                   subtitle: Padding(
-                    padding: const EdgeInsets.fromLTRB(5, 6, 5, 0),
-                    child: Column(
-                      children: <Widget>[
-                        Row(
-                          children: <Widget>[Text("dia")],
-                        ),
-                        Row(
-                          children: <Widget>[
-                            Icon(
-                              Icons.check,
-                              size: 16,
-                            )
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
+                      padding: const EdgeInsets.fromLTRB(5, 6, 5, 0),
+                      child: Text(data[index].message)),
                 ),
               ),
             );

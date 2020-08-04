@@ -131,23 +131,14 @@ class _TasksPageState extends State<TasksPage> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
-                    /* Row(
-                      children: <Widget>[
-                        Flexible(
-                          flex: 5,
-                          child: task(list),
-                        ),
-                        Flexible(
-                          child: addTask(list),
-                        ),
-                      ],
-                    ), */
                     CustomInput(
-                        editingController: controller.taskEditing,
-                        inputType: TextInputType.text,
-                        hintText: "Nome do Hábito",
-                        labelText: "Nome do Hábito",
-                        validator: validators.validateNotEmptyForm),
+                      editingController: controller.taskEditing,
+                      inputType: TextInputType.text,
+                      hintText: "Nome do Hábito",
+                      labelText: "Nome do Hábito",
+                      validator: validators.validateNotEmptyForm,
+                      textCapitalization: TextCapitalization.sentences,
+                    ),
                     SizedBox(
                       height: 20.0,
                     ),
@@ -242,12 +233,14 @@ class _TasksPageState extends State<TasksPage> {
                       height: 20.0,
                     ),
                     CustomInput(
-                        editingController: controller.messageEditing,
-                        inputType: TextInputType.text,
-                        hintText: 'Mensagem',
-                        labelText: 'Mensagem',
-                        icon: Icons.textsms,
-                        validator: validators.validateEmpty),
+                      editingController: controller.messageEditing,
+                      inputType: TextInputType.text,
+                      hintText: 'Mensagem',
+                      labelText: 'Mensagem',
+                      icon: Icons.textsms,
+                      validator: validators.validateEmpty,
+                      textCapitalization: TextCapitalization.sentences,
+                    ),
                   ],
                 ),
               ),

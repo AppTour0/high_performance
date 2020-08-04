@@ -63,7 +63,7 @@ mixin _$TasksController on _TasksBase, Store {
   }
 
   @override
-  set task(ObservableStream<List<Task>> value) {
+  set task(ObservableStream<List<dynamic>> value) {
     _$taskAtom.reportWrite(value, super.task, () {
       super.task = value;
     });
@@ -90,6 +90,15 @@ mixin _$TasksController on _TasksBase, Store {
       {String sound}) {
     return _$dailyNotificationAsyncAction.run(() => super
         .dailyNotification(datetime, message, subtext, hashcode, sound: sound));
+  }
+
+  final _$_showInsistentNotificationAsyncAction =
+      AsyncAction('_TasksBase._showInsistentNotification');
+
+  @override
+  Future<void> _showInsistentNotification() {
+    return _$_showInsistentNotificationAsyncAction
+        .run(() => super._showInsistentNotification());
   }
 
   final _$submitTaskAsyncAction = AsyncAction('_TasksBase.submitTask');

@@ -24,21 +24,6 @@ mixin _$HomeController on _HomeBase, Store {
     });
   }
 
-  final _$tasksAtom = Atom(name: '_HomeBase.tasks');
-
-  @override
-  ObservableStream<List<Task>> get tasks {
-    _$tasksAtom.reportRead();
-    return super.tasks;
-  }
-
-  @override
-  set tasks(ObservableStream<List<Task>> value) {
-    _$tasksAtom.reportWrite(value, super.tasks, () {
-      super.tasks = value;
-    });
-  }
-
   final _$bottomIndexAtom = Atom(name: '_HomeBase.bottomIndex');
 
   @override
@@ -52,6 +37,20 @@ mixin _$HomeController on _HomeBase, Store {
     _$bottomIndexAtom.reportWrite(value, super.bottomIndex, () {
       super.bottomIndex = value;
     });
+  }
+
+  final _$insertDetailAsyncAction = AsyncAction('_HomeBase.insertDetail');
+
+  @override
+  Future insertDetail(DateTime date, int id) {
+    return _$insertDetailAsyncAction.run(() => super.insertDetail(date, id));
+  }
+
+  final _$deleteDetailAsyncAction = AsyncAction('_HomeBase.deleteDetail');
+
+  @override
+  Future deleteDetail(int id) {
+    return _$deleteDetailAsyncAction.run(() => super.deleteDetail(id));
   }
 
   final _$_HomeBaseActionController = ActionController(name: '_HomeBase');
@@ -71,7 +70,6 @@ mixin _$HomeController on _HomeBase, Store {
   String toString() {
     return '''
 daysOfWeek: ${daysOfWeek},
-tasks: ${tasks},
 bottomIndex: ${bottomIndex}
     ''';
   }

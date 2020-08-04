@@ -1186,6 +1186,9 @@ abstract class _$Database extends GeneratedDatabase {
   TasksListRepository _tasksListRepository;
   TasksListRepository get tasksListRepository =>
       _tasksListRepository ??= TasksListRepository(this as Database);
+  TasksDetailRepository _tasksDetailRepository;
+  TasksDetailRepository get tasksDetailRepository =>
+      _tasksDetailRepository ??= TasksDetailRepository(this as Database);
   @override
   Iterable<TableInfo> get allTables => allSchemaEntities.whereType<TableInfo>();
   @override
