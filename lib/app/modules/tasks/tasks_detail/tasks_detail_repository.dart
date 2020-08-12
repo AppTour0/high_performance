@@ -20,6 +20,10 @@ class TasksDetailRepository extends DatabaseAccessor<Database>
     return (select(tasksDetail)..where((u) => u.idTask.equals(id))).watch();
   }
 
+  /* Future<List<TasksDetailData>> getAllTasksDetail() {
+    return (select(tasksDetail)).watch();
+  } */
+
   /* Future insertData(Insertable<TasksListData> task) =>
       into(tasksList).insert(task); */
   Future insertData(TasksDetailData taskDetail) async {
@@ -28,9 +32,16 @@ class TasksDetailRepository extends DatabaseAccessor<Database>
 
   Future updateData(Insertable<TasksDetailData> taskDetail) =>
       update(tasksDetail).replace(taskDetail);
+
   Future deleteData(int id) {
     return (delete(tasksDetail)
           ..where((tasksDetail) => tasksDetail.id.equals(id)))
+        .go();
+  }
+
+  Future deleteAllTask(int idTask) {
+    return (delete(tasksDetail)
+          ..where((tasksDetail) => tasksDetail.idTask.equals(idTask)))
         .go();
   }
 }

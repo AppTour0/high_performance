@@ -38,15 +38,16 @@ abstract class _TasksDetailBase with Store {
       {Future<VoidCallback> onError(String title, String description),
       Future<VoidCallback> onSuccess()}) async {
     try {
-      await _repository
-          .deleteData(id)
+      await _detailRepository
+          .deleteAllTask(id)
+          .then((value) => _repository.deleteData(id))
           .then((value) =>
               {vars.flutterLocalNotificationsPlugin.cancel(id), onSuccess()})
           .catchError((error) => {
                 onError(title, error),
               });
     } catch (e) {
-      onError(title, e.message);
+      onError(title, e._message);
     }
   }
 
@@ -55,10 +56,7 @@ abstract class _TasksDetailBase with Store {
     TasksDetailData model = TasksDetailData(
       id: null,
       idTask: id,
-      confirm: true,
       dateConfirm: date,
-      dateModify: DateTime.now(),
-      dateCreate: DateTime.now(),
     );
     await _detailRepository.insertData(model);
   }

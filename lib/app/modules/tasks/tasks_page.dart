@@ -47,6 +47,7 @@ class _TasksPageState extends State<TasksPage> {
   void initState() {
     super.initState();
     controller.getTask(widget.id);
+    controller.localeColor();
 
     interstitialAd = AdmobInterstitial(
       adUnitId: _adManager.interstitialAdUnitId,
@@ -102,6 +103,7 @@ class _TasksPageState extends State<TasksPage> {
             controller.datetimeToDb = task[0].dateTimeNotification;
             controller.messageEditing.text = task[0].message;
             controller.repeat = task[0].repeat;
+            //controller.colors[] = task[0].color;
             /* controller.taskEditing.text = controller.tasks
                 .where((element) => element.id == data.idTask)
                 .last
@@ -131,13 +133,37 @@ class _TasksPageState extends State<TasksPage> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
-                    CustomInput(
-                      editingController: controller.taskEditing,
-                      inputType: TextInputType.text,
-                      hintText: "Nome do Hábito",
-                      labelText: "Nome do Hábito",
-                      validator: validators.validateNotEmptyForm,
-                      textCapitalization: TextCapitalization.sentences,
+                    Row(
+                      children: <Widget>[
+                        Flexible(
+                          flex: 5,
+                          child: CustomInput(
+                            editingController: controller.taskEditing,
+                            inputType: TextInputType.text,
+                            hintText: "Nome do Hábito",
+                            labelText: "Nome do Hábito",
+                            validator: validators.validateNotEmptyForm,
+                            textCapitalization: TextCapitalization.sentences,
+                            hintStyle: TextStyle(color: controller.color),
+                            labelStyle: TextStyle(color: controller.color),
+                            borderSide:
+                                BorderSide(color: controller.color, width: 1),
+                          ),
+                        ),
+                        Flexible(
+                          child: IconButton(
+                              iconSize: 30,
+                              icon: Icon(
+                                Icons.palette,
+                                color: controller.color,
+                              ),
+                              onPressed: () {
+                                colorDialog(
+                                    context: context,
+                                    title: 'Selecione uma cor');
+                              }),
+                        ),
+                      ],
                     ),
                     SizedBox(
                       height: 20.0,
@@ -181,13 +207,18 @@ class _TasksPageState extends State<TasksPage> {
                         inputType: TextInputType.text,
                         hintText: hintText,
                         labelText: labelText,
-                        icon:
-                            controller.repeat ? Icons.timer : Icons.date_range,
+                        hintStyle: TextStyle(color: controller.color),
+                        labelStyle: TextStyle(color: controller.color),
+                        borderSide:
+                            BorderSide(color: controller.color, width: 1),
+                        icon: controller.repeat
+                            ? Icon(Icons.timer, color: controller.color)
+                            : Icon(Icons.date_range, color: controller.color),
                         readOnly: true,
                         suffixIcon: IconButton(
                           icon: Icon(
                             Icons.arrow_drop_down,
-                            color: Theme.of(context).accentColor,
+                            color: controller.color,
                             size: 30,
                           ),
                           onPressed: () {},
@@ -237,7 +268,13 @@ class _TasksPageState extends State<TasksPage> {
                       inputType: TextInputType.text,
                       hintText: 'Mensagem',
                       labelText: 'Mensagem',
-                      icon: Icons.textsms,
+                      hintStyle: TextStyle(color: controller.color),
+                      labelStyle: TextStyle(color: controller.color),
+                      borderSide: BorderSide(color: controller.color, width: 1),
+                      icon: Icon(
+                        Icons.textsms,
+                        color: controller.color,
+                      ),
                       validator: validators.validateEmpty,
                       textCapitalization: TextCapitalization.sentences,
                     ),
@@ -256,63 +293,63 @@ class _TasksPageState extends State<TasksPage> {
       padding: const EdgeInsets.all(8.0),
       child: Text(text,
           style: TextStyle(
-              color: Colors.teal, fontWeight: FontWeight.bold, fontSize: 16)),
+              color: controller.color,
+              fontWeight: FontWeight.bold,
+              fontSize: 16)),
     );
   }
 
-  Widget taskSelect(List<Map<String, dynamic>> list) {
-    return Padding(
-        padding: const EdgeInsets.fromLTRB(0, 5, 0, 0),
-        child: TextFormField(
-            controller: controller.taskEditing,
-            keyboardType: TextInputType.text,
-            readOnly: true,
-            onTap: () {
-              chooseModal.choose(
-                  context: context,
-                  list: list,
-                  //idEditing: controller.idTaskEditing,
-                  textEditing: controller.taskEditing);
-            },
-            validator: (value) {
-              if (value.isEmpty) {
-                return 'A tarefa não pode ser vazia';
-              }
-              return null;
-            },
-            decoration: InputDecoration(
-                hintText: 'Selecione uma tarefa',
-                labelText: 'Tarefa',
-                suffixIcon: IconButton(
-                  icon: Icon(
-                    Icons.arrow_drop_down,
-                    color: Theme.of(context).accentColor,
-                    size: 30,
-                  ),
-                  onPressed: () {},
-                ))));
-  }
-
-  /* Widget addTask(List<Map<String, dynamic>> list) {
-    return IconButton(
-      onPressed: () {
-        inputDialog.showInput(
-            context: context,
-            changedAction: null,
-            tapAction: tapAction,
-            textEditing: controller.nameTaskEditing);
+  Future colorDialog({
+    BuildContext context,
+    String title,
+    Color color = Colors.black,
+  }) async {
+    return showDialog(
+      context: context,
+      barrierDismissible: false, // user must tap button for close dialog!
+      builder: (BuildContext context) {
+        return AlertDialog(
+            title: Text(
+              title,
+              style: TextStyle(color: color),
+            ),
+            content: Container(
+              height: 100,
+              child: GridView.count(
+                crossAxisCount: 5,
+                children: List.generate(10, (index) {
+                  return InkResponse(
+                    onTap: () {
+                      Modular.to.pop();
+                      controller.clearColor();
+                      controller.colors[index]['selected'] = true;
+                      controller.localeColor();
+                      setState(() {});
+                    },
+                    child: Padding(
+                      padding: const EdgeInsets.all(4),
+                      child: Container(
+                        width: 50,
+                        height: 50,
+                        decoration: new BoxDecoration(
+                          color: controller.colors[index]["color"],
+                          shape: BoxShape.circle,
+                        ),
+                        child: controller.colors[index]["selected"]
+                            ? Icon(
+                                Icons.check,
+                                color: Colors.white,
+                              )
+                            : null,
+                      ),
+                    ),
+                  );
+                }),
+              ),
+            ));
       },
-      icon: Icon(Icons.add_circle),
-      color: Theme.of(context).accentColor,
-      iconSize: 40,
     );
-  } */
-
-  /* tapAction() {
-    List<Task> dataList = controller.task.data;
-    //controller.submitTask(dataList);
-    controller.getTasks();
-  } */
+  }
 
   Widget datePicker() {
     return RaisedButton(
@@ -338,7 +375,7 @@ class _TasksPageState extends State<TasksPage> {
                       Icon(
                         Icons.date_range,
                         size: 18.0,
-                        color: Colors.teal,
+                        color: controller.color,
                       ),
                       Text(
                         " $_date",
@@ -519,3 +556,51 @@ class _TasksPageState extends State<TasksPage> {
     );
   }
 }
+
+/* Widget taskSelect(List<Map<String, dynamic>> list) {
+    return Padding(
+        padding: const EdgeInsets.fromLTRB(0, 5, 0, 0),
+        child: TextFormField(
+            controller: controller.taskEditing,
+            keyboardType: TextInputType.text,
+            readOnly: true,
+            onTap: () {
+              chooseModal.choose(
+                  context: context,
+                  list: list,
+                  //idEditing: controller.idTaskEditing,
+                  textEditing: controller.taskEditing);
+            },
+            validator: (value) {
+              if (value.isEmpty) {
+                return 'A tarefa não pode ser vazia';
+              }
+              return null;
+            },
+            decoration: InputDecoration(
+                hintText: 'Selecione uma tarefa',
+                labelText: 'Tarefa',
+                suffixIcon: IconButton(
+                  icon: Icon(
+                    Icons.arrow_drop_down,
+                    color: Theme.of(context).accentColor,
+                    size: 30,
+                  ),
+                  onPressed: () {},
+                ))));
+  }
+
+  Widget addTask(List<Map<String, dynamic>> list) {
+    return IconButton(
+      onPressed: () {
+        inputDialog.showInput(
+            context: context,
+            changedAction: null,
+            tapAction: tapAction,
+            textEditing: controller.nameTaskEditing);
+      },
+      icon: Icon(Icons.add_circle),
+      color: Theme.of(context).accentColor,
+      iconSize: 40,
+    );
+  } */

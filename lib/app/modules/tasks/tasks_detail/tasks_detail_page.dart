@@ -1,13 +1,14 @@
 import 'package:admob_flutter/admob_flutter.dart';
-import 'package:calendarro/calendarro.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:flutter_modular/flutter_modular.dart';
 import 'package:high_performance/app/modules/tasks/tasks_arguments.dart';
 import 'package:high_performance/app/modules/tasks/tasks_detail/tasks_detail_controller.dart';
 import 'package:high_performance/app/modules/tasks/tasks_detail/tasks_detail_module.dart';
+import 'package:high_performance/app/shared/calendarro/calendarro.dart';
 import 'package:high_performance/app/shared/db/database.dart';
 import 'package:high_performance/app/shared/utils/admob/ad_manager.dart';
+import 'package:high_performance/app/shared/utils/colors.dart';
 import 'package:high_performance/app/shared/utils/utils.dart';
 import 'package:high_performance/app/shared/utils/week_custom.dart';
 import 'package:intl/intl.dart';
@@ -23,6 +24,7 @@ class TasksDetailPage extends StatefulWidget {
 class _TasksDetailPageState extends State<TasksDetailPage> {
   final controller = TasksDetailModule.to.get<TasksDetailController>();
   final now = new DateTime.now();
+  final TextColors textColor = TextColors();
   Utils utils = Utils();
   String formatDate;
   AdManager _adManager = AdManager();
@@ -120,7 +122,8 @@ class _TasksDetailPageState extends State<TasksDetailPage> {
                   controller.daysOfWeek[6]['label'].toString().substring(0, 3))
               : null;
 
-          TextStyle textStyle = TextStyle(fontSize: 16);
+          TextStyle textStyle = TextStyle(
+              fontSize: 16, color: textColor.switchColors(data[0].color));
           return SingleChildScrollView(
               child: Column(
             children: <Widget>[
@@ -132,7 +135,8 @@ class _TasksDetailPageState extends State<TasksDetailPage> {
                       scrollDirection: Axis.horizontal,
                       child: Row(
                         children: <Widget>[
-                          Icon(Icons.repeat),
+                          Icon(Icons.repeat,
+                              color: textColor.switchColors(data[0].color)),
                           SizedBox(
                             width: 5,
                           ),
@@ -187,7 +191,7 @@ class _TasksDetailPageState extends State<TasksDetailPage> {
                       selectionMode: SelectionMode.MULTI,
                       weekdayLabelsRow: CustomWeekdayLabelsRow(),
                       selectedDates: dateList,
-                      selectedSingleDate: now,
+                      color: textColor.switchColors(data[0].color),
                       displayMode: DisplayMode.MONTHS,
                       onTap: (datetime) {
                         List<TasksDetailData> dateFilter = dateListOfTask

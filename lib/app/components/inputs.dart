@@ -11,11 +11,14 @@ class CustomInput extends StatelessWidget {
   final String labelText;
   final Function validator;
   final maxLines;
-  final IconData icon;
+  final Widget icon;
   final bool readOnly;
   final Function onTap;
   final Widget suffixIcon;
   final textCapitalization;
+  final TextStyle hintStyle;
+  final TextStyle labelStyle;
+  final BorderSide borderSide;
 
   const CustomInput({
     Key key,
@@ -31,6 +34,9 @@ class CustomInput extends StatelessWidget {
     this.onTap,
     this.suffixIcon,
     this.textCapitalization = TextCapitalization.none,
+    this.hintStyle,
+    this.labelStyle,
+    this.borderSide = const BorderSide(color: Colors.black, width: 1),
   }) : super(key: key);
 
   @override
@@ -46,15 +52,17 @@ class CustomInput extends StatelessWidget {
           textCapitalization: textCapitalization,
           decoration: InputDecoration(
             hintText: hintText,
+            hintStyle: hintStyle,
             labelText: labelText,
-            icon: icon != null ? Icon(icon) : null,
+            labelStyle: labelStyle,
+            icon: icon != null ? icon : null,
             suffixIcon: suffixIcon,
             focusedBorder: OutlineInputBorder(
-              borderSide:
-                  BorderSide(color: Theme.of(context).accentColor, width: 1),
+              borderSide: borderSide,
             ),
             enabledBorder: OutlineInputBorder(
-              borderSide: BorderSide(color: Colors.teal, width: 1),
+              //borderSide: BorderSide(color: Colors.teal, width: 1),
+              borderSide: borderSide,
             ),
           ),
           validator: (val) {

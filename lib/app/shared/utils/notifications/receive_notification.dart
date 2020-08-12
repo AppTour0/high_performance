@@ -27,4 +27,6 @@ class VariablesNotification {
   BehaviorSubject<String> selectNotificationSubject = BehaviorSubject<String>();
 
   NotificationAppLaunchDetails notificationAppLaunchDetails;
+
+  String playerId;
 }

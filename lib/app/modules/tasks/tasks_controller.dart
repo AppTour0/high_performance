@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:high_performance/app/shared/db/database.dart';
 import 'package:mobx/mobx.dart';
-import 'package:intl/intl.dart';
 import 'package:high_performance/app/shared/utils/notifications/receive_notification.dart';
 
 part 'tasks_controller.g.dart';
@@ -72,8 +71,8 @@ abstract class _TasksBase with Store {
         'channel-id', 'channel-name', 'channel-description',
         //sound: RawResourceAndroidNotificationSound('slow_spring_board'),
         //largeIcon: DrawableResourceAndroidBitmap('sample_large_icon'),
-        importance: Importance.Max,
-        priority: Priority.Max,
+        importance: Importance.max,
+        priority: Priority.max,
         vibrationPattern: vibrationPattern,
         enableLights: true,
         icon: "app_icon",
@@ -91,7 +90,7 @@ abstract class _TasksBase with Store {
       {String sound}) async {
     var iosChannel = IOSNotificationDetails();
     var platformChannel =
-        NotificationDetails(alarmConfigurations(), iosChannel);
+        NotificationDetails(android: alarmConfigurations(), iOS: iosChannel);
 
     vars.flutterLocalNotificationsPlugin.schedule(
         hashcode, message, subtext, datetime, platformChannel,
@@ -106,7 +105,7 @@ abstract class _TasksBase with Store {
 
     var iosChannel = IOSNotificationDetails();
     var platformChannel =
-        NotificationDetails(alarmConfigurations(), iosChannel);
+        NotificationDetails(android: alarmConfigurations(), iOS: iosChannel);
 
     await vars.flutterLocalNotificationsPlugin.showDailyAtTime(
         hashcode, message, subtext, time, platformChannel,
@@ -119,13 +118,14 @@ abstract class _TasksBase with Store {
     var insistentFlag = 4;
     var androidPlatformChannelSpecifics = AndroidNotificationDetails(
         'your channel id', 'your channel name', 'your channel description',
-        importance: Importance.Max,
-        priority: Priority.High,
+        importance: Importance.max,
+        priority: Priority.high,
         ticker: 'ticker',
         additionalFlags: Int32List.fromList([insistentFlag]));
     var iOSPlatformChannelSpecifics = IOSNotificationDetails();
     var platformChannelSpecifics = NotificationDetails(
-        androidPlatformChannelSpecifics, iOSPlatformChannelSpecifics);
+        android: androidPlatformChannelSpecifics,
+        iOS: iOSPlatformChannelSpecifics);
     await vars.flutterLocalNotificationsPlugin.show(
         0, 'insistent title', 'insistent body', platformChannelSpecifics,
         payload: 'item x');
@@ -148,6 +148,44 @@ abstract class _TasksBase with Store {
     }
   } */
 
+  /* ======================== colors ============================ */
+  @observable
+  List<Map<String, dynamic>> colors = [
+    {'colorString': 'black', 'color': Colors.black, 'selected': true},
+    {'colorString': 'cyan', 'color': Colors.cyan, 'selected': false},
+    {'colorString': 'blue', 'color': Colors.blue[600], 'selected': false},
+    {'colorString': 'green', 'color': Colors.green[600], 'selected': false},
+    {'colorString': 'orange', 'color': Colors.orange[600], 'selected': false},
+    {'colorString': 'pink', 'color': Colors.pink, 'selected': false},
+    {'colorString': 'grey', 'color': Colors.grey[600], 'selected': false},
+    {'colorString': 'purple', 'color': Colors.purple[600], 'selected': false},
+    {'colorString': 'red', 'color': Colors.red, 'selected': false},
+    {'colorString': 'indigo', 'color': Colors.indigo, 'selected': false},
+  ];
+
+  @observable
+  Color color = Colors.black;
+
+  @observable
+  String colorDB = "black";
+
+  @action
+  clearColor() {
+    for (var i = 0; i < colors.length; i++) {
+      colors[i]["selected"] = false;
+    }
+  }
+
+  @action
+  localeColor() {
+    for (var i = 0; i < colors.length; i++) {
+      if (colors[i]["selected"]) {
+        color = colors[i]["color"];
+        colorDB = colors[i]["colorString"];
+      }
+    }
+  }
+
   @action
   Future<void> submitTask(List<Task> data,
       {Future<VoidCallback> onError(String title, String description),
@@ -169,6 +207,7 @@ abstract class _TasksBase with Store {
         repeat: repeat,
         dateModify: DateTime.now(),
         dateCreate: DateTime.now(),
+        color: colorDB,
       );
       await _listRepository
           .insertData(model)

@@ -1,4 +1,5 @@
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:high_performance/app/modules/home/tasks_list_model.dart';
 import 'package:high_performance/app/shared/db/database.dart';
 import 'package:mobx/mobx.dart';
 
@@ -26,7 +27,7 @@ abstract class _HomeBase with Store {
     //initializeNotifications();
   }
 
-  @observable
+  /*  @observable
   List<Map<String, dynamic>> daysOfWeek = [
     {'day': 'sun', 'label': 'Domingo', 'bool': false},
     {'day': 'mon', 'label': 'Segunda', 'bool': false},
@@ -35,11 +36,14 @@ abstract class _HomeBase with Store {
     {'day': 'thu', 'label': 'Quinta', 'bool': false},
     {'day': 'fri', 'label': 'Sexta', 'bool': false},
     {'day': 'sat', 'label': 'Sabado', 'bool': false},
-  ];
+  ]; */
 
   ObservableStream<List<Task>> tasks;
   ObservableStream<List<Task>> habits;
   ObservableStream<List<TasksDetailData>> habitsCompleted;
+
+  @observable
+  List<DateTime> dateList = [];
 
   @action
   getLists() {
@@ -56,10 +60,7 @@ abstract class _HomeBase with Store {
     TasksDetailData model = TasksDetailData(
       id: null,
       idTask: id,
-      confirm: true,
       dateConfirm: date,
-      dateModify: DateTime.now(),
-      dateCreate: DateTime.now(),
     );
     await _detailRepository.insertData(model);
   }

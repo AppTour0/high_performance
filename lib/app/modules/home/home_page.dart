@@ -1,23 +1,24 @@
 import 'package:admob_flutter/admob_flutter.dart';
-import 'package:calendarro/calendarro.dart';
+import 'package:android_alarm_manager/android_alarm_manager.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_modular/flutter_modular.dart';
-import 'package:high_performance/app/components/custom_tile/custom_tile.dart';
-import 'package:high_performance/app/components/custom_tile/tile_model.dart';
 import 'package:high_performance/app/modules/home/home_controller.dart';
 import 'package:high_performance/app/modules/home/home_module.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
-import 'package:high_performance/app/modules/tasks/alarm.dart';
 import 'package:high_performance/app/modules/tasks/tasks_arguments.dart';
+import 'package:high_performance/app/shared/calendar/g2x_simple_week_calendar.dart';
+import 'package:high_performance/app/shared/calendarro/calendarro.dart';
 import 'package:high_performance/app/shared/db/database.dart';
 import 'package:high_performance/app/shared/utils/admob/ad_manager.dart';
+import 'package:high_performance/app/shared/utils/colors.dart';
 import 'package:high_performance/app/shared/utils/utils.dart';
 import 'package:high_performance/app/shared/utils/week_custom.dart';
 import 'package:intl/intl.dart';
 import 'dart:ui';
 import 'package:flutter/cupertino.dart';
 import 'package:high_performance/app/shared/utils/notifications/receive_notification.dart';
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:onesignal_flutter/onesignal_flutter.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key key}) : super(key: key);
@@ -27,11 +28,12 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  final controller = HomeModule.to.get<HomeController>();
+  static final controller = HomeModule.to.get<HomeController>();
   VariablesNotification vars = VariablesNotification();
   Utils utils = Utils();
   AdManager _adManager = AdManager();
   DateTime now = DateTime.now();
+  final TextColors textColor = TextColors();
 
   AdmobBannerSize bannerSize;
   AdmobBanner bannerAd;
@@ -49,6 +51,55 @@ class _HomePageState extends State<HomePage> {
 
   setStateCustom() {
     setState(() {});
+  }
+
+  DateTime dateCallback;
+
+  _dateCallback(DateTime date) {
+    dateCallback = date;
+    print(dateCallback);
+  }
+
+  static Future onesignalNotification() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String _playerId = prefs.getString('playerId');
+
+    var notification = OSCreateNotification(
+        playerIds: [_playerId],
+        content: "Teste depois de 1 minuto",
+        heading: "Test Notification",
+        buttons: [
+          OSActionButton(
+              text: "OK",
+              id: "id1",
+              icon:
+                  "@mipmap/ic_launcher" /* icon: "lib/assets/icons/check_icon.png" */),
+          OSActionButton(text: "Cancelar", id: "id2", icon: "ic_launcher.png")
+        ]);
+
+    var response = await OneSignal.shared.postNotification(notification);
+    //print(response);
+
+    OneSignal.shared
+        .setNotificationOpenedHandler((OSNotificationOpenedResult result) {
+      controller.insertDetail(DateTime.now(), 1);
+    });
+  }
+
+  static Future<void> callback() async {
+    print("ok");
+    onesignalNotification();
+  }
+
+  Future alarm() async {
+    await AndroidAlarmManager.oneShot(
+      const Duration(seconds: 5),
+      //DateTime.now(),
+      0,
+      callback,
+      exact: true,
+      wakeup: true,
+    );
   }
 
   @override
@@ -73,14 +124,16 @@ class _HomePageState extends State<HomePage> {
                     .pushNamed("/tasks", arguments: 0)
                     .then((value) => setStateCustom());
               }),
-          /* IconButton(
+          IconButton(
               icon: Icon(Icons.timer),
               onPressed: () {
-                Navigator.push(
+                alarm();
+                /*  Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => Alarm()),
-                );
-              }) */
+                  //MaterialPageRoute(builder: (context) => NotificationPage()),
+                  MaterialPageRoute(builder: (context) => AlarmHomePage()),
+                ); */
+              })
         ],
       ),
       /* floatingActionButton: FloatingActionButton(
@@ -140,23 +193,23 @@ class _HomePageState extends State<HomePage> {
           return Center(child: Text("Não há hábitos"));
         }
 
-        List<DateTime> dateList = [];
         List<TasksDetailData> dateListOfTask = [];
 
         return ListView.builder(
           itemCount: data.length,
           primary: true,
+          shrinkWrap: true,
           itemBuilder: (context, index) {
-            dateList.clear();
+            controller.dateList.clear();
             dateListOfTask.clear();
 
             dateListOfTask = dataDetail
                 .where((element) => element.idTask == data[index].id)
                 .toList();
 
-            dateList = List.generate(dateListOfTask.length, (index) {
-              return dateListOfTask[index].dateConfirm;
-            });
+            for (var i = 0; i < dateListOfTask.length; i++) {
+              controller.dateList.add(dateListOfTask[i].dateConfirm);
+            }
 
             return Padding(
               padding: const EdgeInsets.fromLTRB(5, 5, 5, 0),
@@ -165,7 +218,7 @@ class _HomePageState extends State<HomePage> {
                   borderRadius: BorderRadius.circular(5),
                   color: Colors.white,
                   border: Border.all(
-                    color: Colors.black26,
+                    color: textColor.switchColors(data[index].color),
                     width: 1,
                   ),
                 ),
@@ -178,7 +231,7 @@ class _HomePageState extends State<HomePage> {
                                 arguments: TasksArguments(
                                     data[index].id, data[index].name))
                             .then((value) {
-                          controller.getLists();
+                          //controller.getLists();
                           setState(() {});
                         });
                       },
@@ -187,9 +240,10 @@ class _HomePageState extends State<HomePage> {
                         children: <Widget>[
                           Text(data[index].name,
                               style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 18,
-                              )),
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 18,
+                                  color: textColor
+                                      .switchColors(data[index].color))),
                           Row(
                             children: <Widget>[
                               Icon(
@@ -223,24 +277,66 @@ class _HomePageState extends State<HomePage> {
                       ),
                     ),
                     Padding(
-                      padding: const EdgeInsets.fromLTRB(8, 0, 8, 5),
-                      child: Calendarro(
-                        selectionMode: SelectionMode.MULTI,
-                        weekdayLabelsRow: CustomWeekdayLabelsRow(),
-                        selectedDates: dateList,
-                        selectedSingleDate: now,
-                        onTap: (datetime) {
-                          List<TasksDetailData> dateFilter = dateListOfTask
-                              .where(
-                                  (element) => element.dateConfirm == datetime)
-                              .toList();
-                          dateFilter.length == 0
-                              ? controller.insertDetail(
-                                  datetime, data[index].id)
-                              : controller.deleteDetail(dateFilter[0].id);
-                        },
-                      ),
-                    ),
+                        padding: const EdgeInsets.fromLTRB(8, 0, 8, 0),
+                        child: G2xSimpleWeekCalendar(
+                          50.0,
+                          DateTime.now(),
+                          dateCallback: (date) => _dateCallback(date),
+                          strWeekDays: [
+                            'Dom',
+                            'Seg',
+                            'Ter',
+                            'Qua',
+                            'Qui',
+                            'Sex',
+                            'Sab'
+                          ],
+                          circleColor:
+                              textColor.switchColors(data[index].color),
+                          dateList: controller.dateList,
+                          selectedTextStyle: TextStyle(color: Colors.white),
+                          selectedTextWeek: TextStyle(
+                            color: textColor.switchColors(data[index].color),
+                          ),
+                          backgroundDecoration:
+                              new BoxDecoration(color: Colors.white),
+                        )
+
+                        /* Observer(builder: (context) {
+                        return Expanded(
+                          child: SizedBox(
+                            height: 50,
+                            child: ListView.builder(
+                                itemCount: controller.dateList.length,
+                                primary: true,
+                                //shrinkWrap: true,
+                                scrollDirection: Axis.horizontal,
+                                itemBuilder: (context, index) {
+                                  return Container(
+                                      height: 40,
+                                      decoration: BoxDecoration(
+                                          color: Colors.blue,
+                                          shape: BoxShape.circle),
+                                      child: Center(
+                                          child: Text(
+                                        controller.dateList[index].day
+                                            .toString(),
+                                        textAlign: TextAlign.center,
+                                        style: TextStyle(color: Colors.white),
+                                      )));
+                                }),
+                          ),
+                        );
+                        Calendarro(
+                          enable: false,
+                          selectionMode: SelectionMode.MULTI,
+                          weekdayLabelsRow: CustomWeekdayLabelsRow(),
+                          selectedDates: controller.dateList,
+                          selectedSingleDate: now,
+                          color: textColor.switchColors(data[index].color),
+                        );
+                      }), */
+                        ),
                   ],
                 ),
               ),
@@ -251,6 +347,24 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
+  /* Widget daysOfWeek() {
+    List<Widget> items = new List<Widget>();
+
+    return Observer(builder: (context) {
+      for (var i = 0; i < controller.daysOfWeek.length; i++) {
+        items.add(buildItemCheck(controller.daysOfWeek[i], i));
+      }
+
+      return Row(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        mainAxisSize: MainAxisSize.max,
+        children: <Widget>[
+          for (var item in items) Expanded(child: item),
+        ],
+      );
+    });
+  }
+ */
   Widget unique() {
     return Observer(
       builder: (context) {
@@ -292,9 +406,10 @@ class _HomePageState extends State<HomePage> {
                     children: <Widget>[
                       Text(data[index].name,
                           style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 18,
-                          )),
+                              fontWeight: FontWeight.bold,
+                              fontSize: 18,
+                              color:
+                                  textColor.switchColors(data[index].color))),
                       Row(
                         children: <Widget>[
                           Icon(

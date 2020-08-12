@@ -21,6 +21,7 @@ class Tasks extends Table {
   DateTimeColumn get dateTimeNotification => dateTime()();
   DateTimeColumn get dateCreate => dateTime()();
   DateTimeColumn get dateModify => dateTime()();
+  TextColumn get color => text()();
 
   @override
   Set<Column> get primaryKey => {id};
@@ -29,27 +30,31 @@ class Tasks extends Table {
 class TasksDetail extends Table {
   IntColumn get id => integer().autoIncrement()();
   IntColumn get idTask => integer().customConstraint('REFERENCES Tasks(id)')();
-  BoolColumn get confirm => boolean().withDefault(const Constant(false))();
   DateTimeColumn get dateConfirm => dateTime()();
-  DateTimeColumn get dateCreate => dateTime()();
-  DateTimeColumn get dateModify => dateTime()();
 
   @override
   Set<Column> get primaryKey => {id};
 }
 
-/* class TasksListWithTask {
-  final TasksListData taskList;
+/* class TasksWithDetail {
+  final TasksDetail taskDetail;
   final Task task;
 
-  TasksListWithTask({
-    @required this.taskList,
+  TasksWithDetail({
+    @required this.taskDetail,
     @required this.task,
   });
 } */
 
+class TasksWithDetail {
+  final Task task;
+  final List<TasksDetailData> detail;
+
+  TasksWithDetail(this.task, this.detail);
+}
+
 @UseMoor(
-    tables: [Tasks, TasksDetail],
+    tables: [Tasks, TasksDetail, TasksWithDetail],
     daos: [TasksRepository, TasksListRepository, TasksDetailRepository])
 class Database extends _$Database {
   static Database instance = Database._internal();

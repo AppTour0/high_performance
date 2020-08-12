@@ -9,18 +9,18 @@ part of 'home_controller.dart';
 // ignore_for_file: non_constant_identifier_names, unnecessary_brace_in_string_interps, unnecessary_lambdas, prefer_expression_function_bodies, lines_longer_than_80_chars, avoid_as, avoid_annotating_with_dynamic
 
 mixin _$HomeController on _HomeBase, Store {
-  final _$daysOfWeekAtom = Atom(name: '_HomeBase.daysOfWeek');
+  final _$dateListAtom = Atom(name: '_HomeBase.dateList');
 
   @override
-  List<Map<String, dynamic>> get daysOfWeek {
-    _$daysOfWeekAtom.reportRead();
-    return super.daysOfWeek;
+  List<DateTime> get dateList {
+    _$dateListAtom.reportRead();
+    return super.dateList;
   }
 
   @override
-  set daysOfWeek(List<Map<String, dynamic>> value) {
-    _$daysOfWeekAtom.reportWrite(value, super.daysOfWeek, () {
-      super.daysOfWeek = value;
+  set dateList(List<DateTime> value) {
+    _$dateListAtom.reportWrite(value, super.dateList, () {
+      super.dateList = value;
     });
   }
 
@@ -69,7 +69,7 @@ mixin _$HomeController on _HomeBase, Store {
   @override
   String toString() {
     return '''
-daysOfWeek: ${daysOfWeek},
+dateList: ${dateList},
 bottomIndex: ${bottomIndex}
     ''';
   }

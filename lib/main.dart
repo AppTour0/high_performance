@@ -1,4 +1,6 @@
 import 'dart:async';
+import 'dart:isolate';
+import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:high_performance/app/app_module.dart';
@@ -7,6 +9,8 @@ import 'package:high_performance/app/shared/utils/notifications/receive_notifica
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:onesignal_flutter/onesignal_flutter.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 VariablesNotification vars = VariablesNotification();
 
@@ -28,7 +32,7 @@ Future<void> main() async {
             id: id, title: title, body: body, payload: payload));
       });
   var initializationSettings = InitializationSettings(
-      initializationSettingsAndroid, initializationSettingsIOS);
+      android: initializationSettingsAndroid, iOS: initializationSettingsIOS);
   await vars.flutterLocalNotificationsPlugin.initialize(initializationSettings,
       onSelectNotification: (String payload) async {
     if (payload != null) {
@@ -37,18 +41,24 @@ Future<void> main() async {
     vars.selectNotificationSubject.add(payload);
   });
 
-  /* ==================== firebase admob ===================== */
+  /* ==================== not test ===================== */
 
-  /* MobileAdTargetingInfo targetingInfo = MobileAdTargetingInfo(
-    keywords: <String>['flutterio', 'beautiful apps'],
-    contentUrl: 'https://flutter.io',
-    birthday: DateTime.now(),
-    childDirected: false,
-    designedForFamilies: false,
-    gender:
-        MobileAdGender.male, // or MobileAdGender.female, MobileAdGender.unknown
-    testDevices: <String>[], // Android emulators are considered test devices
-  ); */
+  OneSignal.shared.init(
+    "42ed2b9b-d4d3-438d-9361-826499f3ed25",
+    iOSSettings: {
+      OSiOSSettings.autoPrompt: false,
+      OSiOSSettings.inAppLaunchUrl: false,
+    },
+  );
+  OneSignal.shared
+      .setInFocusDisplayType(OSNotificationDisplayType.notification);
+
+  //
+  // Ao criar a instancia (que deve acontecer apenas uma vez)
+  // o sistema ja deve guardar o playerID do OneSignal
+  var status = await OneSignal.shared.getPermissionSubscriptionState();
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  prefs.setString("playerId", status.subscriptionStatus.userId);
 
   runApp(ModularApp(isCupertino: true, module: AppModule()));
 }

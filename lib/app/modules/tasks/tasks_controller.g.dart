@@ -69,6 +69,51 @@ mixin _$TasksController on _TasksBase, Store {
     });
   }
 
+  final _$colorsAtom = Atom(name: '_TasksBase.colors');
+
+  @override
+  List<Map<String, dynamic>> get colors {
+    _$colorsAtom.reportRead();
+    return super.colors;
+  }
+
+  @override
+  set colors(List<Map<String, dynamic>> value) {
+    _$colorsAtom.reportWrite(value, super.colors, () {
+      super.colors = value;
+    });
+  }
+
+  final _$colorAtom = Atom(name: '_TasksBase.color');
+
+  @override
+  Color get color {
+    _$colorAtom.reportRead();
+    return super.color;
+  }
+
+  @override
+  set color(Color value) {
+    _$colorAtom.reportWrite(value, super.color, () {
+      super.color = value;
+    });
+  }
+
+  final _$colorDBAtom = Atom(name: '_TasksBase.colorDB');
+
+  @override
+  String get colorDB {
+    _$colorDBAtom.reportRead();
+    return super.colorDB;
+  }
+
+  @override
+  set colorDB(String value) {
+    _$colorDBAtom.reportWrite(value, super.colorDB, () {
+      super.colorDB = value;
+    });
+  }
+
   final _$singleNotificationAsyncAction =
       AsyncAction('_TasksBase.singleNotification');
 
@@ -136,12 +181,37 @@ mixin _$TasksController on _TasksBase, Store {
   }
 
   @override
+  dynamic clearColor() {
+    final _$actionInfo =
+        _$_TasksBaseActionController.startAction(name: '_TasksBase.clearColor');
+    try {
+      return super.clearColor();
+    } finally {
+      _$_TasksBaseActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
+  dynamic localeColor() {
+    final _$actionInfo = _$_TasksBaseActionController.startAction(
+        name: '_TasksBase.localeColor');
+    try {
+      return super.localeColor();
+    } finally {
+      _$_TasksBaseActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
   String toString() {
     return '''
 daysOfWeek: ${daysOfWeek},
 repeat: ${repeat},
 alarm: ${alarm},
-task: ${task}
+task: ${task},
+colors: ${colors},
+color: ${color},
+colorDB: ${colorDB}
     ''';
   }
 }

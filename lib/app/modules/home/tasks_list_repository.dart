@@ -4,11 +4,24 @@ import 'package:high_performance/app/shared/db/database.dart';
 part 'tasks_list_repository.g.dart';
 
 @UseDao(
-  tables: [Tasks, TasksDetail],
+  tables: [Tasks, TasksDetail, TasksWithDetail],
 )
 class TasksListRepository extends DatabaseAccessor<Database>
     with _$TasksListRepositoryMixin {
   final Database db;
+
+  /* Future<List<TasksWithDetail>> loadEntries() {
+    // assume that an entry is important if it has the string "important" somewhere in its content
+    final detail;
+    //(select(tasksDetail)).get().then((value) => detail = value).then((value) => null);
+
+    return select(tasks).addColumns([detail]).map((row) {
+      final task = row.readTable(tasks);
+      final detailTask = row.read(detail);
+
+      return TasksWithDetail(task, detailTask);
+    }).get();
+  } */
 
   TasksListRepository(this.db) : super(db);
 
@@ -24,6 +37,24 @@ class TasksListRepository extends DatabaseAccessor<Database>
     return (select(tasks)..where((u) => u.id.equals(id))).watch();
   }
 
+  /* Stream<List<TasksWithDetail>> getTasksWithDetail() {
+    return (select(tasks))
+        .join(
+          [
+            innerJoin(tasksDetail, tasksDetail.idTask.equalsExp(tasks.id)),
+          ],
+        )
+        .watch()
+        .map((rows) => rows.map(
+              (row) {
+                return TasksWithDetail(
+                  task: row.readTable(tasks),
+                  taskDetail: row.readTable(tasksDetail),
+                );
+              },
+            ).toList());
+  } */
+
   /* Future insertData(Insertable<TasksListData> task) =>
       into(tasksList).insert(task); */
   Future insertData(Task task) async {
@@ -31,8 +62,9 @@ class TasksListRepository extends DatabaseAccessor<Database>
   }
 
   Future updateData(Insertable<Task> task) => update(tasks).replace(task);
+
   Future deleteData(int id) {
-    return (delete(tasks)..where((tasksList) => tasksList.id.equals(id))).go();
+    return (delete(tasks)..where((tasks) => tasks.id.equals(id))).go();
   }
 }
 

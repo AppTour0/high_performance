@@ -23,6 +23,7 @@ class Task extends DataClass implements Insertable<Task> {
   final DateTime dateTimeNotification;
   final DateTime dateCreate;
   final DateTime dateModify;
+  final String color;
   Task(
       {@required this.id,
       @required this.name,
@@ -38,7 +39,8 @@ class Task extends DataClass implements Insertable<Task> {
       @required this.message,
       @required this.dateTimeNotification,
       @required this.dateCreate,
-      @required this.dateModify});
+      @required this.dateModify,
+      @required this.color});
   factory Task.fromData(Map<String, dynamic> data, GeneratedDatabase db,
       {String prefix}) {
     final effectivePrefix = prefix ?? '';
@@ -67,6 +69,8 @@ class Task extends DataClass implements Insertable<Task> {
           .mapFromDatabaseResponse(data['${effectivePrefix}date_create']),
       dateModify: dateTimeType
           .mapFromDatabaseResponse(data['${effectivePrefix}date_modify']),
+      color:
+          stringType.mapFromDatabaseResponse(data['${effectivePrefix}color']),
     );
   }
   @override
@@ -117,6 +121,9 @@ class Task extends DataClass implements Insertable<Task> {
     if (!nullToAbsent || dateModify != null) {
       map['date_modify'] = Variable<DateTime>(dateModify);
     }
+    if (!nullToAbsent || color != null) {
+      map['color'] = Variable<String>(color);
+    }
     return map;
   }
 
@@ -147,6 +154,8 @@ class Task extends DataClass implements Insertable<Task> {
       dateModify: dateModify == null && nullToAbsent
           ? const Value.absent()
           : Value(dateModify),
+      color:
+          color == null && nullToAbsent ? const Value.absent() : Value(color),
     );
   }
 
@@ -170,6 +179,7 @@ class Task extends DataClass implements Insertable<Task> {
           serializer.fromJson<DateTime>(json['dateTimeNotification']),
       dateCreate: serializer.fromJson<DateTime>(json['dateCreate']),
       dateModify: serializer.fromJson<DateTime>(json['dateModify']),
+      color: serializer.fromJson<String>(json['color']),
     );
   }
   @override
@@ -191,6 +201,7 @@ class Task extends DataClass implements Insertable<Task> {
       'dateTimeNotification': serializer.toJson<DateTime>(dateTimeNotification),
       'dateCreate': serializer.toJson<DateTime>(dateCreate),
       'dateModify': serializer.toJson<DateTime>(dateModify),
+      'color': serializer.toJson<String>(color),
     };
   }
 
@@ -209,7 +220,8 @@ class Task extends DataClass implements Insertable<Task> {
           String message,
           DateTime dateTimeNotification,
           DateTime dateCreate,
-          DateTime dateModify}) =>
+          DateTime dateModify,
+          String color}) =>
       Task(
         id: id ?? this.id,
         name: name ?? this.name,
@@ -226,6 +238,7 @@ class Task extends DataClass implements Insertable<Task> {
         dateTimeNotification: dateTimeNotification ?? this.dateTimeNotification,
         dateCreate: dateCreate ?? this.dateCreate,
         dateModify: dateModify ?? this.dateModify,
+        color: color ?? this.color,
       );
   @override
   String toString() {
@@ -244,7 +257,8 @@ class Task extends DataClass implements Insertable<Task> {
           ..write('message: $message, ')
           ..write('dateTimeNotification: $dateTimeNotification, ')
           ..write('dateCreate: $dateCreate, ')
-          ..write('dateModify: $dateModify')
+          ..write('dateModify: $dateModify, ')
+          ..write('color: $color')
           ..write(')'))
         .toString();
   }
@@ -279,8 +293,11 @@ class Task extends DataClass implements Insertable<Task> {
                                                           .hashCode,
                                                       $mrjc(
                                                           dateCreate.hashCode,
-                                                          dateModify
-                                                              .hashCode)))))))))))))));
+                                                          $mrjc(
+                                                              dateModify
+                                                                  .hashCode,
+                                                              color
+                                                                  .hashCode))))))))))))))));
   @override
   bool operator ==(dynamic other) =>
       identical(this, other) ||
@@ -299,7 +316,8 @@ class Task extends DataClass implements Insertable<Task> {
           other.message == this.message &&
           other.dateTimeNotification == this.dateTimeNotification &&
           other.dateCreate == this.dateCreate &&
-          other.dateModify == this.dateModify);
+          other.dateModify == this.dateModify &&
+          other.color == this.color);
 }
 
 class TasksCompanion extends UpdateCompanion<Task> {
@@ -318,6 +336,7 @@ class TasksCompanion extends UpdateCompanion<Task> {
   final Value<DateTime> dateTimeNotification;
   final Value<DateTime> dateCreate;
   final Value<DateTime> dateModify;
+  final Value<String> color;
   const TasksCompanion({
     this.id = const Value.absent(),
     this.name = const Value.absent(),
@@ -334,6 +353,7 @@ class TasksCompanion extends UpdateCompanion<Task> {
     this.dateTimeNotification = const Value.absent(),
     this.dateCreate = const Value.absent(),
     this.dateModify = const Value.absent(),
+    this.color = const Value.absent(),
   });
   TasksCompanion.insert({
     this.id = const Value.absent(),
@@ -351,11 +371,13 @@ class TasksCompanion extends UpdateCompanion<Task> {
     @required DateTime dateTimeNotification,
     @required DateTime dateCreate,
     @required DateTime dateModify,
+    @required String color,
   })  : name = Value(name),
         message = Value(message),
         dateTimeNotification = Value(dateTimeNotification),
         dateCreate = Value(dateCreate),
-        dateModify = Value(dateModify);
+        dateModify = Value(dateModify),
+        color = Value(color);
   static Insertable<Task> custom({
     Expression<int> id,
     Expression<String> name,
@@ -372,6 +394,7 @@ class TasksCompanion extends UpdateCompanion<Task> {
     Expression<DateTime> dateTimeNotification,
     Expression<DateTime> dateCreate,
     Expression<DateTime> dateModify,
+    Expression<String> color,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
@@ -390,6 +413,7 @@ class TasksCompanion extends UpdateCompanion<Task> {
         'date_time_notification': dateTimeNotification,
       if (dateCreate != null) 'date_create': dateCreate,
       if (dateModify != null) 'date_modify': dateModify,
+      if (color != null) 'color': color,
     });
   }
 
@@ -408,7 +432,8 @@ class TasksCompanion extends UpdateCompanion<Task> {
       Value<String> message,
       Value<DateTime> dateTimeNotification,
       Value<DateTime> dateCreate,
-      Value<DateTime> dateModify}) {
+      Value<DateTime> dateModify,
+      Value<String> color}) {
     return TasksCompanion(
       id: id ?? this.id,
       name: name ?? this.name,
@@ -425,6 +450,7 @@ class TasksCompanion extends UpdateCompanion<Task> {
       dateTimeNotification: dateTimeNotification ?? this.dateTimeNotification,
       dateCreate: dateCreate ?? this.dateCreate,
       dateModify: dateModify ?? this.dateModify,
+      color: color ?? this.color,
     );
   }
 
@@ -477,6 +503,9 @@ class TasksCompanion extends UpdateCompanion<Task> {
     if (dateModify.present) {
       map['date_modify'] = Variable<DateTime>(dateModify.value);
     }
+    if (color.present) {
+      map['color'] = Variable<String>(color.value);
+    }
     return map;
   }
 
@@ -497,7 +526,8 @@ class TasksCompanion extends UpdateCompanion<Task> {
           ..write('message: $message, ')
           ..write('dateTimeNotification: $dateTimeNotification, ')
           ..write('dateCreate: $dateCreate, ')
-          ..write('dateModify: $dateModify')
+          ..write('dateModify: $dateModify, ')
+          ..write('color: $color')
           ..write(')'))
         .toString();
   }
@@ -661,6 +691,18 @@ class $TasksTable extends Tasks with TableInfo<$TasksTable, Task> {
     );
   }
 
+  final VerificationMeta _colorMeta = const VerificationMeta('color');
+  GeneratedTextColumn _color;
+  @override
+  GeneratedTextColumn get color => _color ??= _constructColor();
+  GeneratedTextColumn _constructColor() {
+    return GeneratedTextColumn(
+      'color',
+      $tableName,
+      false,
+    );
+  }
+
   @override
   List<GeneratedColumn> get $columns => [
         id,
@@ -677,7 +719,8 @@ class $TasksTable extends Tasks with TableInfo<$TasksTable, Task> {
         message,
         dateTimeNotification,
         dateCreate,
-        dateModify
+        dateModify,
+        color
       ];
   @override
   $TasksTable get asDslTable => this;
@@ -765,6 +808,12 @@ class $TasksTable extends Tasks with TableInfo<$TasksTable, Task> {
     } else if (isInserting) {
       context.missing(_dateModifyMeta);
     }
+    if (data.containsKey('color')) {
+      context.handle(
+          _colorMeta, color.isAcceptableOrUnknown(data['color'], _colorMeta));
+    } else if (isInserting) {
+      context.missing(_colorMeta);
+    }
     return context;
   }
 
@@ -785,36 +834,21 @@ class $TasksTable extends Tasks with TableInfo<$TasksTable, Task> {
 class TasksDetailData extends DataClass implements Insertable<TasksDetailData> {
   final int id;
   final int idTask;
-  final bool confirm;
   final DateTime dateConfirm;
-  final DateTime dateCreate;
-  final DateTime dateModify;
   TasksDetailData(
-      {@required this.id,
-      @required this.idTask,
-      @required this.confirm,
-      @required this.dateConfirm,
-      @required this.dateCreate,
-      @required this.dateModify});
+      {@required this.id, @required this.idTask, @required this.dateConfirm});
   factory TasksDetailData.fromData(
       Map<String, dynamic> data, GeneratedDatabase db,
       {String prefix}) {
     final effectivePrefix = prefix ?? '';
     final intType = db.typeSystem.forDartType<int>();
-    final boolType = db.typeSystem.forDartType<bool>();
     final dateTimeType = db.typeSystem.forDartType<DateTime>();
     return TasksDetailData(
       id: intType.mapFromDatabaseResponse(data['${effectivePrefix}id']),
       idTask:
           intType.mapFromDatabaseResponse(data['${effectivePrefix}id_task']),
-      confirm:
-          boolType.mapFromDatabaseResponse(data['${effectivePrefix}confirm']),
       dateConfirm: dateTimeType
           .mapFromDatabaseResponse(data['${effectivePrefix}date_confirm']),
-      dateCreate: dateTimeType
-          .mapFromDatabaseResponse(data['${effectivePrefix}date_create']),
-      dateModify: dateTimeType
-          .mapFromDatabaseResponse(data['${effectivePrefix}date_modify']),
     );
   }
   @override
@@ -826,17 +860,8 @@ class TasksDetailData extends DataClass implements Insertable<TasksDetailData> {
     if (!nullToAbsent || idTask != null) {
       map['id_task'] = Variable<int>(idTask);
     }
-    if (!nullToAbsent || confirm != null) {
-      map['confirm'] = Variable<bool>(confirm);
-    }
     if (!nullToAbsent || dateConfirm != null) {
       map['date_confirm'] = Variable<DateTime>(dateConfirm);
-    }
-    if (!nullToAbsent || dateCreate != null) {
-      map['date_create'] = Variable<DateTime>(dateCreate);
-    }
-    if (!nullToAbsent || dateModify != null) {
-      map['date_modify'] = Variable<DateTime>(dateModify);
     }
     return map;
   }
@@ -846,18 +871,9 @@ class TasksDetailData extends DataClass implements Insertable<TasksDetailData> {
       id: id == null && nullToAbsent ? const Value.absent() : Value(id),
       idTask:
           idTask == null && nullToAbsent ? const Value.absent() : Value(idTask),
-      confirm: confirm == null && nullToAbsent
-          ? const Value.absent()
-          : Value(confirm),
       dateConfirm: dateConfirm == null && nullToAbsent
           ? const Value.absent()
           : Value(dateConfirm),
-      dateCreate: dateCreate == null && nullToAbsent
-          ? const Value.absent()
-          : Value(dateCreate),
-      dateModify: dateModify == null && nullToAbsent
-          ? const Value.absent()
-          : Value(dateModify),
     );
   }
 
@@ -867,10 +883,7 @@ class TasksDetailData extends DataClass implements Insertable<TasksDetailData> {
     return TasksDetailData(
       id: serializer.fromJson<int>(json['id']),
       idTask: serializer.fromJson<int>(json['idTask']),
-      confirm: serializer.fromJson<bool>(json['confirm']),
       dateConfirm: serializer.fromJson<DateTime>(json['dateConfirm']),
-      dateCreate: serializer.fromJson<DateTime>(json['dateCreate']),
-      dateModify: serializer.fromJson<DateTime>(json['dateModify']),
     );
   }
   @override
@@ -879,120 +892,71 @@ class TasksDetailData extends DataClass implements Insertable<TasksDetailData> {
     return <String, dynamic>{
       'id': serializer.toJson<int>(id),
       'idTask': serializer.toJson<int>(idTask),
-      'confirm': serializer.toJson<bool>(confirm),
       'dateConfirm': serializer.toJson<DateTime>(dateConfirm),
-      'dateCreate': serializer.toJson<DateTime>(dateCreate),
-      'dateModify': serializer.toJson<DateTime>(dateModify),
     };
   }
 
-  TasksDetailData copyWith(
-          {int id,
-          int idTask,
-          bool confirm,
-          DateTime dateConfirm,
-          DateTime dateCreate,
-          DateTime dateModify}) =>
+  TasksDetailData copyWith({int id, int idTask, DateTime dateConfirm}) =>
       TasksDetailData(
         id: id ?? this.id,
         idTask: idTask ?? this.idTask,
-        confirm: confirm ?? this.confirm,
         dateConfirm: dateConfirm ?? this.dateConfirm,
-        dateCreate: dateCreate ?? this.dateCreate,
-        dateModify: dateModify ?? this.dateModify,
       );
   @override
   String toString() {
     return (StringBuffer('TasksDetailData(')
           ..write('id: $id, ')
           ..write('idTask: $idTask, ')
-          ..write('confirm: $confirm, ')
-          ..write('dateConfirm: $dateConfirm, ')
-          ..write('dateCreate: $dateCreate, ')
-          ..write('dateModify: $dateModify')
+          ..write('dateConfirm: $dateConfirm')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode => $mrjf($mrjc(
-      id.hashCode,
-      $mrjc(
-          idTask.hashCode,
-          $mrjc(
-              confirm.hashCode,
-              $mrjc(dateConfirm.hashCode,
-                  $mrjc(dateCreate.hashCode, dateModify.hashCode))))));
+  int get hashCode =>
+      $mrjf($mrjc(id.hashCode, $mrjc(idTask.hashCode, dateConfirm.hashCode)));
   @override
   bool operator ==(dynamic other) =>
       identical(this, other) ||
       (other is TasksDetailData &&
           other.id == this.id &&
           other.idTask == this.idTask &&
-          other.confirm == this.confirm &&
-          other.dateConfirm == this.dateConfirm &&
-          other.dateCreate == this.dateCreate &&
-          other.dateModify == this.dateModify);
+          other.dateConfirm == this.dateConfirm);
 }
 
 class TasksDetailCompanion extends UpdateCompanion<TasksDetailData> {
   final Value<int> id;
   final Value<int> idTask;
-  final Value<bool> confirm;
   final Value<DateTime> dateConfirm;
-  final Value<DateTime> dateCreate;
-  final Value<DateTime> dateModify;
   const TasksDetailCompanion({
     this.id = const Value.absent(),
     this.idTask = const Value.absent(),
-    this.confirm = const Value.absent(),
     this.dateConfirm = const Value.absent(),
-    this.dateCreate = const Value.absent(),
-    this.dateModify = const Value.absent(),
   });
   TasksDetailCompanion.insert({
     this.id = const Value.absent(),
     @required int idTask,
-    this.confirm = const Value.absent(),
     @required DateTime dateConfirm,
-    @required DateTime dateCreate,
-    @required DateTime dateModify,
   })  : idTask = Value(idTask),
-        dateConfirm = Value(dateConfirm),
-        dateCreate = Value(dateCreate),
-        dateModify = Value(dateModify);
+        dateConfirm = Value(dateConfirm);
   static Insertable<TasksDetailData> custom({
     Expression<int> id,
     Expression<int> idTask,
-    Expression<bool> confirm,
     Expression<DateTime> dateConfirm,
-    Expression<DateTime> dateCreate,
-    Expression<DateTime> dateModify,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
       if (idTask != null) 'id_task': idTask,
-      if (confirm != null) 'confirm': confirm,
       if (dateConfirm != null) 'date_confirm': dateConfirm,
-      if (dateCreate != null) 'date_create': dateCreate,
-      if (dateModify != null) 'date_modify': dateModify,
     });
   }
 
   TasksDetailCompanion copyWith(
-      {Value<int> id,
-      Value<int> idTask,
-      Value<bool> confirm,
-      Value<DateTime> dateConfirm,
-      Value<DateTime> dateCreate,
-      Value<DateTime> dateModify}) {
+      {Value<int> id, Value<int> idTask, Value<DateTime> dateConfirm}) {
     return TasksDetailCompanion(
       id: id ?? this.id,
       idTask: idTask ?? this.idTask,
-      confirm: confirm ?? this.confirm,
       dateConfirm: dateConfirm ?? this.dateConfirm,
-      dateCreate: dateCreate ?? this.dateCreate,
-      dateModify: dateModify ?? this.dateModify,
     );
   }
 
@@ -1005,17 +969,8 @@ class TasksDetailCompanion extends UpdateCompanion<TasksDetailData> {
     if (idTask.present) {
       map['id_task'] = Variable<int>(idTask.value);
     }
-    if (confirm.present) {
-      map['confirm'] = Variable<bool>(confirm.value);
-    }
     if (dateConfirm.present) {
       map['date_confirm'] = Variable<DateTime>(dateConfirm.value);
-    }
-    if (dateCreate.present) {
-      map['date_create'] = Variable<DateTime>(dateCreate.value);
-    }
-    if (dateModify.present) {
-      map['date_modify'] = Variable<DateTime>(dateModify.value);
     }
     return map;
   }
@@ -1025,10 +980,7 @@ class TasksDetailCompanion extends UpdateCompanion<TasksDetailData> {
     return (StringBuffer('TasksDetailCompanion(')
           ..write('id: $id, ')
           ..write('idTask: $idTask, ')
-          ..write('confirm: $confirm, ')
-          ..write('dateConfirm: $dateConfirm, ')
-          ..write('dateCreate: $dateCreate, ')
-          ..write('dateModify: $dateModify')
+          ..write('dateConfirm: $dateConfirm')
           ..write(')'))
         .toString();
   }
@@ -1057,15 +1009,6 @@ class $TasksDetailTable extends TasksDetail
         $customConstraints: 'REFERENCES Tasks(id)');
   }
 
-  final VerificationMeta _confirmMeta = const VerificationMeta('confirm');
-  GeneratedBoolColumn _confirm;
-  @override
-  GeneratedBoolColumn get confirm => _confirm ??= _constructConfirm();
-  GeneratedBoolColumn _constructConfirm() {
-    return GeneratedBoolColumn('confirm', $tableName, false,
-        defaultValue: const Constant(false));
-  }
-
   final VerificationMeta _dateConfirmMeta =
       const VerificationMeta('dateConfirm');
   GeneratedDateTimeColumn _dateConfirm;
@@ -1080,35 +1023,8 @@ class $TasksDetailTable extends TasksDetail
     );
   }
 
-  final VerificationMeta _dateCreateMeta = const VerificationMeta('dateCreate');
-  GeneratedDateTimeColumn _dateCreate;
   @override
-  GeneratedDateTimeColumn get dateCreate =>
-      _dateCreate ??= _constructDateCreate();
-  GeneratedDateTimeColumn _constructDateCreate() {
-    return GeneratedDateTimeColumn(
-      'date_create',
-      $tableName,
-      false,
-    );
-  }
-
-  final VerificationMeta _dateModifyMeta = const VerificationMeta('dateModify');
-  GeneratedDateTimeColumn _dateModify;
-  @override
-  GeneratedDateTimeColumn get dateModify =>
-      _dateModify ??= _constructDateModify();
-  GeneratedDateTimeColumn _constructDateModify() {
-    return GeneratedDateTimeColumn(
-      'date_modify',
-      $tableName,
-      false,
-    );
-  }
-
-  @override
-  List<GeneratedColumn> get $columns =>
-      [id, idTask, confirm, dateConfirm, dateCreate, dateModify];
+  List<GeneratedColumn> get $columns => [id, idTask, dateConfirm];
   @override
   $TasksDetailTable get asDslTable => this;
   @override
@@ -1129,10 +1045,6 @@ class $TasksDetailTable extends TasksDetail
     } else if (isInserting) {
       context.missing(_idTaskMeta);
     }
-    if (data.containsKey('confirm')) {
-      context.handle(_confirmMeta,
-          confirm.isAcceptableOrUnknown(data['confirm'], _confirmMeta));
-    }
     if (data.containsKey('date_confirm')) {
       context.handle(
           _dateConfirmMeta,
@@ -1140,22 +1052,6 @@ class $TasksDetailTable extends TasksDetail
               data['date_confirm'], _dateConfirmMeta));
     } else if (isInserting) {
       context.missing(_dateConfirmMeta);
-    }
-    if (data.containsKey('date_create')) {
-      context.handle(
-          _dateCreateMeta,
-          dateCreate.isAcceptableOrUnknown(
-              data['date_create'], _dateCreateMeta));
-    } else if (isInserting) {
-      context.missing(_dateCreateMeta);
-    }
-    if (data.containsKey('date_modify')) {
-      context.handle(
-          _dateModifyMeta,
-          dateModify.isAcceptableOrUnknown(
-              data['date_modify'], _dateModifyMeta));
-    } else if (isInserting) {
-      context.missing(_dateModifyMeta);
     }
     return context;
   }
