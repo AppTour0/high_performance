@@ -2,6 +2,7 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:high_performance/app/modules/home/tasks_list_model.dart';
 import 'package:high_performance/app/shared/db/database.dart';
 import 'package:mobx/mobx.dart';
+import 'package:onesignal_flutter/onesignal_flutter.dart';
 
 part 'home_controller.g.dart';
 
@@ -10,6 +11,7 @@ class HomeController = _HomeBase with _$HomeController;
 abstract class _HomeBase with Store {
   final _repository = Database.instance.tasksListRepository;
   final _detailRepository = Database.instance.tasksDetailRepository;
+  String playerId = "";
 
   /* FlutterLocalNotificationsPlugin localNotificationsPlugin =
       FlutterLocalNotificationsPlugin();
@@ -24,7 +26,15 @@ abstract class _HomeBase with Store {
 
   _HomeBase() {
     getLists();
+    getPlayerId();
     //initializeNotifications();
+  }
+
+  @action
+  Future getPlayerId() async {
+    var state = await OneSignal.shared.getPermissionSubscriptionState();
+    playerId = state.subscriptionStatus.userId;
+    print(playerId);
   }
 
   /*  @observable

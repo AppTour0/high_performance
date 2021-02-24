@@ -18,7 +18,7 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 version: 1.0.0+1
 
 environment:
-  sdk: ">=2.7.0 <3.0.0"
+  sdk: ">=2.8.0 <3.0.0"
 
 dependencies:
   flutter_mobx: ^1.1.0+1
@@ -32,7 +32,7 @@ dependencies:
   path:
   path_provider:
   android_alarm_manager: ^0.4.5+11
-  flutter_local_notifications: ^1.5.0-beta.6
+  flutter_local_notifications: ^1.5.0-beta.7
   shared_preferences: 0.5.8
   flutter_ringtone_player: 2.0.0
   flushbar: ^1.10.4
@@ -107,5 +107,6 @@ flutter:
   # see https://flutter.dev/custom-fonts/#from-packages
 scripts:
   laucher_icon: flutter pub run flutter_launcher_icons:main
-  mobx: flutter pub run build_runner watch --delete-conflicting-outputs
+  mobxd: flutter pub run build_runner watch --delete-conflicting-outputs
+  mobx: flutter pub run build_runner watch
   splash: flutter pub pub run flutter_native_splash:create

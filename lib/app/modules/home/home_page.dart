@@ -7,12 +7,11 @@ import 'package:high_performance/app/modules/home/home_module.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:high_performance/app/modules/tasks/tasks_arguments.dart';
 import 'package:high_performance/app/shared/calendar/g2x_simple_week_calendar.dart';
-import 'package:high_performance/app/shared/calendarro/calendarro.dart';
 import 'package:high_performance/app/shared/db/database.dart';
 import 'package:high_performance/app/shared/utils/admob/ad_manager.dart';
+import 'package:high_performance/app/modules/tasks/alarm_manager2.dart';
 import 'package:high_performance/app/shared/utils/colors.dart';
 import 'package:high_performance/app/shared/utils/utils.dart';
-import 'package:high_performance/app/shared/utils/week_custom.dart';
 import 'package:intl/intl.dart';
 import 'dart:ui';
 import 'package:flutter/cupertino.dart';
@@ -34,12 +33,12 @@ class _HomePageState extends State<HomePage> {
   AdManager _adManager = AdManager();
   DateTime now = DateTime.now();
   final TextColors textColor = TextColors();
+  static var playerId = "";
 
   AdmobBannerSize bannerSize;
   AdmobBanner bannerAd;
 
   void initState() {
-    super.initState();
     Admob.initialize(_adManager.appId);
     bannerSize = AdmobBannerSize.BANNER;
 
@@ -47,6 +46,8 @@ class _HomePageState extends State<HomePage> {
       adUnitId: _adManager.bannerAdUnitId,
       adSize: bannerSize,
     );
+    getOneSignal();
+    super.initState();
   }
 
   setStateCustom() {
@@ -61,45 +62,44 @@ class _HomePageState extends State<HomePage> {
   }
 
   static Future onesignalNotification() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    String _playerId = prefs.getString('playerId');
+    await getOneSignal();
 
     var notification = OSCreateNotification(
-        playerIds: [_playerId],
+        playerIds: [playerId],
         content: "Teste depois de 1 minuto",
         heading: "Test Notification",
+        androidSmallIcon: "@drawable/ic_stat_one_signal_default",
         buttons: [
           OSActionButton(
-              text: "OK",
-              id: "id1",
-              icon:
-                  "@mipmap/ic_launcher" /* icon: "lib/assets/icons/check_icon.png" */),
-          OSActionButton(text: "Cancelar", id: "id2", icon: "ic_launcher.png")
+            text: "OK",
+            id: "id1",
+            icon: "@drawable/check_icon",
+          ),
+          OSActionButton(
+            text: "Cancelar",
+            id: "id2",
+            icon: "@drawable/cancel_icon",
+          )
         ]);
+    await OneSignal.shared.postNotification(notification);
+  }
 
-    var response = await OneSignal.shared.postNotification(notification);
-    //print(response);
+  static Future getOneSignal() async {
+    var state = await OneSignal.shared.getPermissionSubscriptionState();
+    playerId = state.subscriptionStatus.userId;
+    print(playerId);
 
-    OneSignal.shared
-        .setNotificationOpenedHandler((OSNotificationOpenedResult result) {
-      controller.insertDetail(DateTime.now(), 1);
-    });
+    void _handleNotificationOpened(OSNotificationOpenedResult result) {
+      print('[notification_service - _handleNotificationOpened()');
+      print(
+          "Opened notification: ${result.notification.jsonRepresentation().replaceAll("\\n", "\n")}");
+    }
+
+    OneSignal.shared.setNotificationOpenedHandler(_handleNotificationOpened);
   }
 
   static Future<void> callback() async {
-    print("ok");
     onesignalNotification();
-  }
-
-  Future alarm() async {
-    await AndroidAlarmManager.oneShot(
-      const Duration(seconds: 5),
-      //DateTime.now(),
-      0,
-      callback,
-      exact: true,
-      wakeup: true,
-    );
   }
 
   @override
@@ -124,15 +124,25 @@ class _HomePageState extends State<HomePage> {
                     .pushNamed("/tasks", arguments: 0)
                     .then((value) => setStateCustom());
               }),
-          IconButton(
+          /* IconButton(
               icon: Icon(Icons.timer),
               onPressed: () {
-                alarm();
-                /*  Navigator.push(
+                AndroidAlarmManager.oneShot(
+                  const Duration(seconds: 0),
+                  //DateTime.now(),
+                  0,
+                  callback,
+                  exact: true,
+                  wakeup: true,
+                );
+              }), */
+          IconButton(
+              icon: Icon(Icons.accessibility),
+              onPressed: () async {
+                Navigator.push(
                   context,
-                  //MaterialPageRoute(builder: (context) => NotificationPage()),
-                  MaterialPageRoute(builder: (context) => AlarmHomePage()),
-                ); */
+                  MaterialPageRoute(builder: (context) => AlarmHomePage2()),
+                );
               })
         ],
       ),
@@ -161,12 +171,12 @@ class _HomePageState extends State<HomePage> {
                   items: [
                     BottomNavigationBarItem(
                       icon: Icon(Icons.refresh),
-                      title: Text("Hábitos"),
+                      label: "Hábitos",
                       backgroundColor: Theme.of(context).accentColor,
                     ),
                     BottomNavigationBarItem(
                       icon: Icon(Icons.format_list_bulleted),
-                      title: Text("Tarefas"),
+                      label: "Tarefas",
                       backgroundColor: Colors.deepPurpleAccent[200],
                     ),
                   ]);
@@ -389,7 +399,7 @@ class _HomePageState extends State<HomePage> {
                   borderRadius: BorderRadius.circular(5),
                   color: Colors.white,
                   border: Border.all(
-                    color: Colors.black26,
+                    color: textColor.switchColors(data[index].color),
                     width: 1,
                   ),
                 ),

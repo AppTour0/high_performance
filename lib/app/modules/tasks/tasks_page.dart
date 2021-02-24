@@ -9,6 +9,7 @@ import 'package:high_performance/app/modules/tasks/tasks_controller.dart';
 import 'package:high_performance/app/modules/tasks/tasks_module.dart';
 import 'package:high_performance/app/shared/db/database.dart';
 import 'package:high_performance/app/shared/utils/admob/ad_manager.dart';
+import 'package:high_performance/app/shared/utils/colors.dart';
 import 'package:high_performance/app/shared/utils/utils.dart';
 import 'package:high_performance/app/shared/utils/validators.dart';
 import 'package:intl/intl.dart';
@@ -31,6 +32,7 @@ class _TasksPageState extends State<TasksPage> {
   final _formKey = GlobalKey<FormState>();
   Utils utils = Utils();
   Validators validators = Validators();
+  final TextColors textColor = TextColors();
 
   String _date = "Selecione uma data";
   String _time = "Selecione um horário";
@@ -103,7 +105,16 @@ class _TasksPageState extends State<TasksPage> {
             controller.datetimeToDb = task[0].dateTimeNotification;
             controller.messageEditing.text = task[0].message;
             controller.repeat = task[0].repeat;
-            //controller.colors[] = task[0].color;
+
+            // regra das cores
+            controller.clearColor();
+            controller.color = textColor.switchColors(task[0].color);
+            controller.colorDB = task[0].color;
+            for (var i = 0; i < controller.colors.length; i++) {
+              if (controller.colors[i]['color'] == task[0].color) {
+                controller.colors[i]['selected'] = true;
+              }
+            }
             /* controller.taskEditing.text = controller.tasks
                 .where((element) => element.id == data.idTask)
                 .last
@@ -212,8 +223,12 @@ class _TasksPageState extends State<TasksPage> {
                         borderSide:
                             BorderSide(color: controller.color, width: 1),
                         icon: controller.repeat
-                            ? Icon(Icons.timer, color: controller.color)
-                            : Icon(Icons.date_range, color: controller.color),
+                            ? Icon(
+                                Icons.timer, /* color: controller.color */
+                              )
+                            : Icon(
+                                Icons.date_range, /* color: controller.color */
+                              ),
                         readOnly: true,
                         suffixIcon: IconButton(
                           icon: Icon(
@@ -273,7 +288,7 @@ class _TasksPageState extends State<TasksPage> {
                       borderSide: BorderSide(color: controller.color, width: 1),
                       icon: Icon(
                         Icons.textsms,
-                        color: controller.color,
+                        /* color: controller.color, */
                       ),
                       validator: validators.validateEmpty,
                       textCapitalization: TextCapitalization.sentences,

@@ -1,6 +1,4 @@
 import 'dart:async';
-import 'dart:isolate';
-import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:high_performance/app/app_module.dart';
@@ -11,6 +9,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:onesignal_flutter/onesignal_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:android_alarm_manager/android_alarm_manager.dart';
 
 VariablesNotification vars = VariablesNotification();
 
@@ -42,6 +41,7 @@ Future<void> main() async {
   });
 
   /* ==================== not test ===================== */
+  AndroidAlarmManager.initialize();
 
   OneSignal.shared.init(
     "42ed2b9b-d4d3-438d-9361-826499f3ed25",
@@ -56,9 +56,10 @@ Future<void> main() async {
   //
   // Ao criar a instancia (que deve acontecer apenas uma vez)
   // o sistema ja deve guardar o playerID do OneSignal
-  var status = await OneSignal.shared.getPermissionSubscriptionState();
+  /* var status = await OneSignal.shared.getPermissionSubscriptionState();
   SharedPreferences prefs = await SharedPreferences.getInstance();
   prefs.setString("playerId", status.subscriptionStatus.userId);
+  print(status.subscriptionStatus.userId); */
 
   runApp(ModularApp(isCupertino: true, module: AppModule()));
 }

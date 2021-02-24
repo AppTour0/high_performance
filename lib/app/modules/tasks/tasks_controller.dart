@@ -1,11 +1,14 @@
 import 'dart:typed_data';
 
+import 'package:android_alarm_manager/android_alarm_manager.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:high_performance/app/shared/db/database.dart';
 import 'package:mobx/mobx.dart';
 import 'package:high_performance/app/shared/utils/notifications/receive_notification.dart';
+import 'package:onesignal_flutter/onesignal_flutter.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 part 'tasks_controller.g.dart';
 
@@ -15,6 +18,7 @@ abstract class _TasksBase with Store {
   final _listRepository = Database.instance.tasksListRepository;
   VariablesNotification vars = VariablesNotification();
   String title = "Atenção!!!";
+  static String playerId;
 
   @observable
   List<Map<String, dynamic>> daysOfWeek = [
@@ -186,6 +190,47 @@ abstract class _TasksBase with Store {
     }
   }
 
+  /* ======================= OneSignal ============================ */
+
+  static Future onesignalNotification() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String _playerId = prefs.getString('playerId');
+
+    var notification = OSCreateNotification(
+      playerIds: [_playerId],
+      content: "Teste depois de 1 minuto",
+      heading: "Test Notification",
+      /* buttons: [
+          OSActionButton(
+              text: "OK",
+              id: "id1",
+              icon:
+                  "@mipmap/ic_launcher" ),//icon: "lib/assets/icons/check_icon.png"),
+          OSActionButton(text: "Cancelar", id: "id2", icon: "ic_launcher.png")
+        ] */
+    );
+
+    await OneSignal.shared.postNotification(notification);
+  }
+
+  static Future<void> callback() async {
+    print("ok");
+    onesignalNotification();
+  }
+
+  @action
+  Future shotAlarm() async {
+    await AndroidAlarmManager.oneShot(
+      const Duration(seconds: 5),
+      //DateTime.now(),
+      0,
+      callback,
+      exact: true,
+      wakeup: true,
+    );
+  }
+
+  /* ======================= Submit =========================== */
   @action
   Future<void> submitTask(List<Task> data,
       {Future<VoidCallback> onError(String title, String description),
@@ -230,6 +275,7 @@ abstract class _TasksBase with Store {
               message: messageEditing.text,
               repeat: repeat,
               dateTimeNotification: datetimeToDb,
+              color: colorDB,
               dateModify: DateTime.now()))
           .then((value) =>
               vars.flutterLocalNotificationsPlugin.cancel(data[0].id))

@@ -146,6 +146,13 @@ mixin _$TasksController on _TasksBase, Store {
         .run(() => super._showInsistentNotification());
   }
 
+  final _$shotAlarmAsyncAction = AsyncAction('_TasksBase.shotAlarm');
+
+  @override
+  Future<dynamic> shotAlarm() {
+    return _$shotAlarmAsyncAction.run(() => super.shotAlarm());
+  }
+
   final _$submitTaskAsyncAction = AsyncAction('_TasksBase.submitTask');
 
   @override

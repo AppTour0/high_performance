@@ -39,6 +39,13 @@ mixin _$HomeController on _HomeBase, Store {
     });
   }
 
+  final _$getPlayerIdAsyncAction = AsyncAction('_HomeBase.getPlayerId');
+
+  @override
+  Future<dynamic> getPlayerId() {
+    return _$getPlayerIdAsyncAction.run(() => super.getPlayerId());
+  }
+
   final _$insertDetailAsyncAction = AsyncAction('_HomeBase.insertDetail');
 
   @override
